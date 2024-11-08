@@ -5,6 +5,11 @@ import time
 
 import matplotlib.pyplot as plt
 from pyproj import Transformer
+from shapely.geometry.geo import box
+from shapely.geometry.linestring import LineString
+
+from Bi_RRT_star_main import re_obs, plot_obs, plot_obs_rec, check_collision, prune_path
+
 
 # from matplotlib import pyplot as plt
 # 定义RRT的节点类
@@ -14,6 +19,7 @@ class Node:
         self.x = x
         self.y = y
         self.parent = None
+        # self.cost=0.0
 
 
 # 计算两点间的距离
@@ -57,6 +63,7 @@ def calc_p2l_dis(line_point1, line_point2, point):  # 到两点确定的直线�
     dis = abs(A * x3 + B * y3 + C) / math.sqrt(A ** 2 + B ** 2)
     return dis
 
+
 #定义到线段的距离
 def calc_p2l_xianduan_dis(line_point1, line_point2, point):
     if isinstance(line_point1, Node):
@@ -73,8 +80,8 @@ def calc_p2l_xianduan_dis(line_point1, line_point2, point):
         x3, y3 = point
     px = x2 - x1
     py = y2 - y1
-    something = px*px + py*py
-    u =  ((x3 - x1) * px + (y3 - y1) * py) / float(something)
+    something = px * px + py * py
+    u = ((x3 - x1) * px + (y3 - y1) * py) / float(something)
     if u > 1:
         u = 1
     elif u < 0:
@@ -83,8 +90,7 @@ def calc_p2l_xianduan_dis(line_point1, line_point2, point):
     y = y1 + u * py
     dx = x - x3
     dy = y - y3
-    return math.sqrt(dx*dx + dy*dy)
-
+    return math.sqrt(dx * dx + dy * dy)
 
 
 # 计算角BAC的角度
@@ -149,20 +155,20 @@ def generate_new_node(nearest_node, random_node, extend_length):
 
 
 # 检查点1和点2连接成的线段是否与障碍物碰撞，若碰撞则返回True，反则反之
-def check_collision(node1, node2, obstacleList):
-    for [ox, oy, size] in obstacleList:
-        round = Node(ox, oy)
-        size_new = size
-        if node2 is None:
-            return False
-        if calc_p2p_dis(node1, round) <= size_new:
-            return True  # collision
-        if calc_p2p_dis(node2, round) <= size_new:
-            return True
-        if calc_p2l_dis(node1, node2, round) <= size_new and calc_triangle_deg(node1, round, node2) <= 90 and \
-                calc_triangle_deg(node2, round, node1) <= 90:
-            return True
-    return False  # not collision
+# def check_collision(node1, node2, obstacleList):
+#     for [ox, oy, size] in obstacleList:
+#         round = Node(ox, oy)
+#         size_new = size
+#         if node2 is None:
+#             return False
+#         if calc_p2p_dis(node1, round) <= size_new:
+#             return True  # collision
+#         if calc_p2p_dis(node2, round) <= size_new:
+#             return True
+#         if calc_p2l_dis(node1, node2, round) <= size_new and calc_triangle_deg(node1, round, node2) <= 90 and \
+#                 calc_triangle_deg(node2, round, node1) <= 90:
+#             return True
+#     return False  # not collision
 
 
 # 生成路径
@@ -178,24 +184,26 @@ def generate_final_course(goal_node, node_list):  # 原路径中多加入一点
         path.append(path_reverse[-(i + 1)])
     return path
 
+
 # 剪枝
-def prune_path(path, obs_list):
-    pruned_path = [path[0]]  # 开始时，剪枝后的路径只包含第一个节点
-    i = 0
-    minidegree=90
-    while i < len(path):
-        for j in range(i + 1, len(path)-1):
-            if abs(180-calc_triangle_deg(path[j],path[i],path[j+1]))<minidegree:
-                if check_collision(path[i], path[j], obs_list):
-                    # 如果路径[i, j]与障碍物相交，那么将路径[i, j-1]添加到剪枝后的路径中
-                    pruned_path.append(path[j - 1])
-                    i = j - 1  # 更新当前节点的索引
-                    break
-        else:
-            # 如果路径[i, j]对所有j都不与障碍物相交，那么将路径的最后一个节点添加到剪枝后的路径中
-            pruned_path.append(path[-1])
-            break
-    return pruned_path
+# def prune_path(path, obs_list):
+#     pruned_path = [path[0]]  # 开始时，剪枝后的路径只包含第一个节点
+#     i = 0
+#     minidegree = 90
+#     while i < len(path):
+#         for j in range(i + 1, len(path) - 1):
+#             if abs(180 - calc_triangle_deg(path[j], path[i], path[j + 1])) < minidegree:
+#                 if check_collision(path[i], path[j], obs_list):
+#                     # 如果路径[i, j]与障碍物相交，那么将路径[i, j-1]添加到剪枝后的路径中
+#                     pruned_path.append(path[j - 1])
+#                     i = j - 1  # 更新当前节点的索引
+#                     break
+#         else:
+#             # 如果路径[i, j]对所有j都不与障碍物相交，那么将路径的最后一个节点添加到剪枝后的路径中
+#             pruned_path.append(path[-1])
+#             break
+#     return pruned_path
+
 
 # transformer=Transformer.from_crs("epsg:4326", "epsg:3857")
 # def latlon_to_xy(lat, lon):
@@ -218,16 +226,16 @@ def RRT_plan(start_xy, goal_xy,
     print("起始点：")
     print(start_xy)
     print(goal_xy)
-    x_min=min(start_xy[0],goal_xy[0])-10
-    x_max=max(start_xy[0],goal_xy[0])+10
-    y_min=min(start_xy[1],goal_xy[1])-10
-    y_max=max(start_xy[1],goal_xy[1])+10
-    print(x_min,x_max,y_min,y_max)
+    x_min = min(start_xy[0], goal_xy[0]) - 10
+    x_max = max(start_xy[0], goal_xy[0]) + 10
+    y_min = min(start_xy[1], goal_xy[1]) - 10
+    y_max = max(start_xy[1], goal_xy[1]) + 10
+    print(x_min, x_max, y_min, y_max)
     # obslis_xy=[[latlon_to_xy(obstacle[1], obstacle[0])[0],
     #             latlon_to_xy(obstacle[1], obstacle[0])[1], obstacle[2]+10] for obstacle in obs_list]
-    start_point=start_xy
-    goal_point=goal_xy
-    obs_list=obslis_xy
+    start_point = start_xy
+    goal_point = goal_xy
+    obs_list = obslis_xy
     extend_length = 5
     mini_degree = 90
     max_iter = 10000
@@ -264,10 +272,10 @@ def RRT_plan(start_xy, goal_xy,
             plt.axis("equal")
             plt.axis([0.0, 260.0, -200.0, 10.0])
             for node1 in node_list1:
-                node2=new_nd2
+                node2 = new_nd2
                 if calc_p2p_dis(node1, node2) <= extend_length and \
                         check_collision(node1, node2, obs_list) == False:
-                        # 生成从起点到相交点的路径
+                    # 生成从起点到相交点的路径
                     path1 = []
                     node = node1
                     while node is not None:
@@ -283,12 +291,12 @@ def RRT_plan(start_xy, goal_xy,
                     # 合并两条路径
                     path = path1 + path2
                     # return path
-                    return prune_path(path,obs_list)
+                    return prune_path(path, obs_list)
             for node2 in node_list2:
-                node1=new_nd1
+                node1 = new_nd1
                 if calc_p2p_dis(node1, node2) <= extend_length and \
                         check_collision(node1, node2, obs_list) == False:
-                        # 生成从起点到相交点的路径
+                    # 生成从起点到相交点的路径
                     path1 = []
                     node = node1
                     while node is not None:
@@ -304,26 +312,49 @@ def RRT_plan(start_xy, goal_xy,
                     # 合并两条路径
                     path = path1 + path2
                     # return path
-                    return prune_path(path,obs_list)
+                    return prune_path(path, obs_list)
         return None
+
 
 #计算路径总长
 def calc_path_length(path):
     total_length = 0
     for i in range(len(path) - 1):
-        total_length += calc_p2p_dis(path[i], path[i+1])
+        total_length += calc_p2p_dis(path[i], path[i + 1])
     return total_length
 
+
 # 画圆
-def plot_circle(x, y, size, color="-b"):  # pragma: no cover
-    deg = list(range(0, 360, 5))
-    deg.append(0)
-    xl = [x + size * math.cos(math.radians(d)) for d in deg]
-    yl = [y + size * math.sin(math.radians(d)) for d in deg]
-    plt.plot(xl, yl, color)
+# def plot_circle(x, y, size, color="-b"):  # pragma: no cover
+#     deg = list(range(0, 360, 5))
+#     deg.append(0)
+#     xl = [x + size * math.cos(math.radians(d)) for d in deg]
+#     yl = [y + size * math.sin(math.radians(d)) for d in deg]
+#     plt.plot(xl, yl, color)
+def check_collision(node1, node2, obstacleList):
+    for obstacle in obstacleList:
+        if len(obstacle) == 3:  # 圆形障碍物
+            ox, oy, size = obstacle
+            round = Node(ox, oy)
+            size_new = size
+            if calc_p2p_dis(node1, round) <= size_new:
+                return True
+            if calc_p2p_dis(node2, round) <= size_new:
+                return True
+            if calc_p2l_dis(node1, node2, round) <= size_new and calc_triangle_deg(node1, round, node2) <= 90 and \
+                    calc_triangle_deg(node2, round, node1) <= 90:
+                return True
+        elif len(obstacle) == 4:  # 矩形障碍物
+            rect_shape = box(obstacle[0], obstacle[1], obstacle[2], obstacle[3])
+            if not isinstance(node1, list):
+                line = LineString([(node1.x, node1.y), (node2.x, node2.y)])
+            else:
+                line = LineString([(node1[0], node1[1]), (node2[0], node2[1])])
+            if line.intersects(rect_shape):
+                return True
+    return False
 
-
-def path_score(path,all_time,obs_list):
+def path_score(path, all_time, obs_list):
     print("运行时间：", all_time, "s")
     print("路径总长：", calc_path_length(path), "m")
     length = calc_path_length(path)
@@ -335,8 +366,9 @@ def path_score(path,all_time,obs_list):
         total_angle = 0
     print("累积转角：", total_angle, "°")
     min_dis = float('inf')
-    obstacle_list = [[latlon_to_xy(obstacle[1], obstacle[0])[0],
-                  latlon_to_xy(obstacle[1], obstacle[0])[1], obstacle[2]] for obstacle in obs_list]
+    obstacle_list=obs_list
+    # obstacle_list = [[latlon_to_xy(obstacle[1], obstacle[0])[0],
+    #                   latlon_to_xy(obstacle[1], obstacle[0])[1], obstacle[2]] for obstacle in obs_list]
     for i in range(len(path) - 1):
         for obs in obstacle_list:
             dis = calc_p2l_xianduan_dis(path[i], path[i + 1], (obs[0], obs[1]))
@@ -348,41 +380,48 @@ def path_score(path,all_time,obs_list):
                 min_dis = dis
     print("最近距离：", min_dis, "m")
     score = 35 * (1 - all_time / 2) + 35 * (1 - (length - 300) / 100) + 20 * (1 - total_angle / 180) + 10 * (
-                min_dis - 10) / 0.5
+            min_dis - 10) / 0.5
     print("路径评分：", score)
     return score
 
 
 if __name__ == "__main__":
-    start_time=time.time()
+    start_time = time.time()
 
     # 画图
-    start=[8.77650817669928, 4.951398874633014]
-    goal=[249.09851929917932, -195.2040752498433]
-    obstacle_list=[[33.77685192972422, -52.90446031652391, 7.5], [46.19124796241522, -77.85628066305071, 9.0],
-                    [80.34613360464573, -43.54909089393914, 7.5], [111.38825733587146, -74.74188929889351, 7.5],
-                    [80.16235236078501, 9.456780110485852, 4.5], [139.31754435040057, -12.368450773879886, 4.5],
-                    [207.6151233687997, 3.4003808852285147, 15.0], [111.59657261520624, -127.13194767106324, 15.0],
-                    [307.5552379246801, -6.496737029403448, 15.0], [182.18576977215707, -97.71181975770742, 15.0],
-                    [232.431648472324, -58.93625687714666, 15.0], [76.79213218018413, -161.22955951932818, 7.5],
-                    [168.2150300759822, -149.5354239968583, 7.5], [265.8879858329892, -127.0088061131537, 7.5],
-                    [325.93784911744297, -71.36904122401029, 7.5], [284.0254806391895, -45.27248460613191, 4.5]]
+    start = [8.77650817669928, 4.951398874633014]
+    goal = [249.09851929917932, -195.2040752498433]
+    obstacle_list = [[33.77685192972422, -52.90446031652391, 7.5], [46.19124796241522, -77.85628066305071, 9.0],
+                     [80.34613360464573, -43.54909089393914, 7.5], [111.38825733587146, -74.74188929889351, 7.5],
+                     [80.16235236078501, 9.456780110485852, 4.5], [139.31754435040057, -12.368450773879886, 4.5],
+                     [207.6151233687997, 3.4003808852285147, 15.0], [111.59657261520624, -127.13194767106324, 15.0],
+                     [307.5552379246801, -6.496737029403448, 15.0], [182.18576977215707, -97.71181975770742, 15.0],
+                     [232.431648472324, -58.93625687714666, 15.0], [76.79213218018413, -161.22955951932818, 7.5],
+                     [168.2150300759822, -149.5354239968583, 7.5], [265.8879858329892, -127.0088061131537, 7.5],
+                     [325.93784911744297, -71.36904122401029, 7.5], [284.0254806391895, -45.27248460613191, 4.5]]
+
+    obstacle_list = re_obs(obstacle_list)
+
     path = RRT_plan(start, goal, obstacle_list)
     print(path)
 
     # goal = latlon_to_xy(goal[1], goal[0])
-    obstacle=obstacle_list
+    obstacle = obstacle_list
     plt.plot(start[0], start[1], "xk")
     plt.plot(goal[0], goal[1], "xk")
     plt.axis("equal")
     plt.axis([0, 260, -200, 10])
-    for [x, y, size] in obstacle:
-        plot_circle(x, y, size)
+
+    for obs in obstacle:
+        if len(obs) == 3:
+            plot_obs(obs[0], obs[1], obs[2])
+        elif len(obs) == 4:
+            plot_obs_rec(obs[0], obs[1], obs[2], obs[3])
 
     # 画图
     plt.plot([x for (x, y) in path], [y for (x, y) in path], 'r')
     # plt.pause(0.01)
     plt.show()
-    end_time=time.time()
-    all_time=end_time-start_time
-    path_score(path,all_time,obstacle_list)
+    end_time = time.time()
+    all_time = end_time - start_time
+    path_score(path, all_time, obstacle_list)
