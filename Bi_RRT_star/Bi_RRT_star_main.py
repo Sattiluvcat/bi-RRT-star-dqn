@@ -196,7 +196,6 @@ def generate_final_course(goal_node, node_list):  # 原路径中多加入一点
 def prune_path(path, obs_list):
     pruned_path = [path[0]]
     i = 0
-
     while i < len(path) - 1:
         found = False
         for j in range(len(path) - 1, i, -1):
@@ -206,12 +205,10 @@ def prune_path(path, obs_list):
                 found = True
                 break
         if not found:
-            # 确保路径总是前进，避免死循环
+            # 确保路径前进
             i += 1
-
     if pruned_path[-1] != path[-1]:
         pruned_path.append(path[-1])
-
     return pruned_path
 
 

@@ -8,7 +8,7 @@ from pyproj import Transformer
 from shapely.geometry.geo import box
 from shapely.geometry.linestring import LineString
 
-from Bi_RRT_star_main import re_obs, plot_obs, plot_obs_rec, check_collision, prune_path
+from Bi_RRT_star_main import re_obs, plot_obs, plot_obs_rec, prune_path
 
 
 # from matplotlib import pyplot as plt
