@@ -183,24 +183,8 @@ def prune_path(path, obs_list):
     return pruned_path
 
 
-# transformer=Transformer.from_crs("epsg:4326", "epsg:3857")
-# def latlon_to_xy(lat, lon):
-#     x, y = transformer.transform(lat, lon)
-#     x=x-13308770
-#     y=y-4219000
-#     return x, y
-
-# def xy_to_latlon(x, y):
-#     x=x+13308770
-#     y=y+4219000
-#     lon, lat = transformer.transform(x,y,direction='INVERSE')
-#     return lat, lon
-
 def RRT_plan(start_xy, goal_xy,
              obslis_xy):
-    # point:[x,y], boundary:[x_min,x_max,y_min,y_max], obs_list:[[x1,y1,r1],...]
-    # start_xy=latlon_to_xy(start_point[1],start_point[0])
-    # goal_xy=latlon_to_xy(goal_point[1],goal_point[0])
     print("起始点：")
     print(start_xy)
     print(goal_xy)
@@ -209,8 +193,6 @@ def RRT_plan(start_xy, goal_xy,
     y_min = min(start_xy[1], goal_xy[1]) - 10
     y_max = max(start_xy[1], goal_xy[1]) + 10
     print(x_min, x_max, y_min, y_max)
-    # obslis_xy=[[latlon_to_xy(obstacle[1], obstacle[0])[0],
-    #             latlon_to_xy(obstacle[1], obstacle[0])[1], obstacle[2]+10] for obstacle in obs_list]
     start_point = start_xy
     goal_point = goal_xy
     obs_list = obslis_xy
