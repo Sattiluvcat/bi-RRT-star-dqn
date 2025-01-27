@@ -4,15 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b809a385-8e20-41df-b484-3d2583d0f90c" name="更改" comment="dwa结合 效果尚可——遇障碍就切换到dwa">
-      <change afterPath="$PROJECT_DIR$/multi_planning/vfrrt_dwa.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/result_show/vfrrt_dwa_main.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/single_planning/VF_Bi_RRT_star.py" afterDir="false" />
+    <list default="true" id="b809a385-8e20-41df-b484-3d2583d0f90c" name="更改" comment="">
       <change afterPath="$PROJECT_DIR$/../pythonProject/try.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/multi_planning/rrt_dwa.py" beforeDir="false" afterPath="$PROJECT_DIR$/multi_planning/rrt_dwa.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/result_show/rrt_dwa_main.py" beforeDir="false" afterPath="$PROJECT_DIR$/result_show/rrt_dwa_main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/result_show/vfrrt_dwa_main.py" beforeDir="false" afterPath="$PROJECT_DIR$/result_show/vfrrt_dwa_main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/single_planning/Bi_RRT.py" beforeDir="false" afterPath="$PROJECT_DIR$/single_planning/Bi_RRT.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/single_planning/VF_Bi_RRT_star.py" beforeDir="false" afterPath="$PROJECT_DIR$/single_planning/VF_Bi_RRT_star.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -49,7 +46,7 @@
     "Python.rrt_dwa.executor": "Run",
     "Python.rrt_dwa_main.executor": "Run",
     "Python.rrt_main.executor": "Run",
-    "Python.vfrrt-dwa.executor": "Run",
+    "Python.vfrrt-dwa.executor": "Debug",
     "Python.vfrrt_dwa.executor": "ConcurrencyExecutor",
     "Python.vfrrt_dwa_main.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
@@ -138,7 +135,12 @@
       <workItem from="1735219931272" duration="39000" />
       <workItem from="1735793995827" duration="24794000" />
       <workItem from="1735874319246" duration="2659000" />
-      <workItem from="1735965137652" duration="20576000" />
+      <workItem from="1735965137652" duration="21360000" />
+      <workItem from="1735993762881" duration="555000" />
+      <workItem from="1736135779938" duration="1603000" />
+      <workItem from="1736489819800" duration="607000" />
+      <workItem from="1736520004926" duration="1201000" />
+      <workItem from="1737943208164" duration="4695000" />
     </task>
     <task id="LOCAL-00001" summary="剪枝&amp;避障正常（矩形&amp;圆形）&#10;star效果一般（感觉不如剪枝 不知道为什么">
       <option name="closed" value="true" />
@@ -156,7 +158,23 @@
       <option name="project" value="LOCAL" />
       <updated>1732855826979</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="dwa与rrt的方法优化与效果更新">
+      <option name="closed" value="true" />
+      <created>1735993346302</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1735993346302</updated>
+    </task>
+    <task id="LOCAL-00004" summary="vfrrt&amp;dwa初试，暂时效果不明显">
+      <option name="closed" value="true" />
+      <created>1735993429875</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1735993429875</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -188,15 +206,17 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="剪枝&amp;避障正常（矩形&amp;圆形）&#10;star效果一般（感觉不如剪枝 不知道为什么" />
     <MESSAGE value="dwa结合 效果尚可——遇障碍就切换到dwa" />
-    <option name="LAST_COMMIT_MESSAGE" value="dwa结合 效果尚可——遇障碍就切换到dwa" />
+    <MESSAGE value="dwa与rrt的方法优化与效果更新" />
+    <MESSAGE value="vfrrt&amp;dwa初试，暂时效果不明显" />
+    <option name="LAST_COMMIT_MESSAGE" value="vfrrt&amp;dwa初试，暂时效果不明显" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/multi_planning/vfrrt_dwa.py</url>
-          <line>64</line>
-          <option name="timeStamp" value="38" />
+          <line>66</line>
+          <option name="timeStamp" value="40" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
@@ -207,7 +227,7 @@
     <SUITE FILE_PATH="coverage/DWA_py$rrt_main.coverage" NAME="rrt_main 覆盖结果" MODIFIED="1734169291391" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/result_show" />
     <SUITE FILE_PATH="coverage/Bi_RRT_star_main_py$dwa_test.coverage" NAME="dwa_test 覆盖结果" MODIFIED="1732767316374" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/DWA_py$main.coverage" NAME="main 覆盖结果" MODIFIED="1732782396759" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/result_show" />
-    <SUITE FILE_PATH="coverage/DWA_py$vfrrt_dwa.coverage" NAME="vfrrt-dwa 覆盖结果" MODIFIED="1735992417779" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/DWA_py$vfrrt_dwa.coverage" NAME="vfrrt-dwa 覆盖结果" MODIFIED="1737947849983" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/Bi_RRT_star_main_py$hello.coverage" NAME="hello 覆盖结果" MODIFIED="1731310219666" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/DWA_py$rrt_dwa_main.coverage" NAME="rrt_dwa_main 覆盖结果" MODIFIED="1735818177191" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/result_show" />
     <SUITE FILE_PATH="coverage/DWA_py$dwa_test.coverage" NAME="dwa_test 覆盖结果" MODIFIED="1734163820319" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />

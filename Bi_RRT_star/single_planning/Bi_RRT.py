@@ -214,7 +214,8 @@ def RRT_plan(start_xy, goal_xy,
             near_index2 = get_nearest_node_index(node_list2, rnd_nd)
             new_nd1 = generate_new_node(node_list1[near_index1], rnd_nd, extend_length)
             new_nd2 = generate_new_node(node_list2[near_index2], rnd_nd, extend_length)
-            if node_list1[near_index1 - 1] != None and node_list2[near_index2 - 1] != None:
+            # 转角约束
+            if node_list1[near_index1 - 1] is not None and node_list2[near_index2 - 1] is not None:
                 degree1 = calc_triangle_deg(node_list1[near_index1], rnd_nd, node_list1[near_index1 - 1])
                 degree2 = calc_triangle_deg(node_list2[near_index2], rnd_nd, node_list2[near_index2 - 1])
                 if degree1 < mini_degree and degree1 != 0 and degree2 < mini_degree and degree2 != 0:

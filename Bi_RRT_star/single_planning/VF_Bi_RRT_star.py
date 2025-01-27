@@ -6,21 +6,25 @@ from utils.node import Node
 
 
 # 结合向量场方向得到新节点
-def vf_generate_new_node(nearest_node, random_node, extend_length, vector_field):
+def vf_generate_new_node(nearest_node, random_node, extend_length, vector_field, is_start_tree):
     # 获取最近节点到随机点的方向向量
     direction_to_random = np.array([random_node.x - nearest_node.x, random_node.y - nearest_node.y])
     # 不该出现0的情况（原来是回旋镖）
-    if np.linalg.norm(direction_to_random)!=0:
+    if np.linalg.norm(direction_to_random) != 0:
         direction_to_random /= np.linalg.norm(direction_to_random)
-    print("nearest_node:", nearest_node.x, nearest_node.y)
+    # print("nearest_node:", nearest_node.x, nearest_node.y)
 
     # 获取最近节点处的向量场方向
     u, v = get_vector_field(nearest_node.x, nearest_node.y, vector_field)
     direction_vector_field = np.array([u, v])
 
+    # 终点树向量场反向
+    if not is_start_tree:
+        direction_vector_field = -direction_vector_field
+
     # TODO 方向选取的优化
     # 两个方向向量的加权平均方向
-    average_direction_vector = (direction_to_random*4 + direction_vector_field) / 5
+    average_direction_vector = (direction_to_random + direction_vector_field) / 2
 
     # 归一化平均方向向量
     average_direction_vector /= np.linalg.norm(average_direction_vector)
@@ -38,13 +42,14 @@ def vf_generate_new_node(nearest_node, random_node, extend_length, vector_field)
 # 得到该位置向量场方向——插值
 def get_vector_field(x, y, vector_field):
     X, Y, U, V = vector_field
-    x1 = int(np.floor(x))+20
+    x1 = int(np.floor(x)) + 20
     # 向量场的坐标系是从-220到20,U V的坐标系是从0开始
-    y1 = int(np.floor(y))+220
+    y1 = int(np.floor(y)) + 220
     x2 = x1 + 1
     y2 = y1 + 1
 
     # u = U[y1, x1]*(x2-x) * (y2-y) + U[y1, x2]*(x-x1) * (y2-y) + U[y2, x1]*(x2-x) * (y-y1) + U[y2, x2]*(x-x1) * (y-y1)
+    # v = V[y1, x1]*(x2-x) * (y2-y) + V[y1, x2]*(x-x1) * (y2-y) + V[y2, x1]*(x2-x) * (y-y1) + V[y2, x2]*(x-x1) * (y-y1)
     u = U[y1, x1]
     v = V[y1, x1]
     return u, v
@@ -56,7 +61,7 @@ def upstream_criterion(path, vector_field):
     for i in range(1, len(path)):
         # 当前位置的向量场
         u, v = get_vector_field(path[i][0], path[i][1], vector_field)
-        vector_field_magnitude = np.sqrt(u**2 + v**2)
+        vector_field_magnitude = np.sqrt(u ** 2 + v ** 2)
         # 本来已经归一化了 但是计算精度可能不准确 此处二加工
         direction_vector_field = np.array([u, v]) / vector_field_magnitude
 
@@ -79,6 +84,7 @@ def choose_lowest_cost(paths, vector_field):
     best_path = None
     for path in paths:
         cost = upstream_criterion(path, vector_field)
+        print("cost:", cost)
         if cost < min_cost:
             min_cost = cost
             best_path = path
@@ -102,7 +108,8 @@ def vf_prune_path(path, obs_list, vector_field):
                 score_start_to_current = path_score(pruned_path + path[j:], vector_field)
                 # 计算路径评分——已优化路径
                 score_current_to_previous = path_score(candidate_path, vector_field)
-
+                print("score_start_to_current:", score_start_to_current,
+                      " score_current_to_previous:", score_current_to_previous)
                 # Compare the scores
                 if score_start_to_current < score_current_to_previous:
                     pruned_path.append(path[j])
@@ -133,7 +140,7 @@ def path_score(path, vector_field):
 
     return total_difference + total_angle
 
-# TODO 现有效果一般
+
 def VF_Bi_RRT_star_plan(start_xy, goal_xy, obslis_xy, vector_field):
     x_min = min(start_xy[0], goal_xy[0]) - 10
     x_max = max(start_xy[0], goal_xy[0]) + 10
@@ -144,6 +151,7 @@ def VF_Bi_RRT_star_plan(start_xy, goal_xy, obslis_xy, vector_field):
     obs_list = obslis_xy
     extend_length = 5
     max_iter = 10000
+    mini_degree=90      # 最大转角，180°-mini_degree，反着定义
     # 路径总数
     path_num = 5
 
@@ -163,23 +171,33 @@ def VF_Bi_RRT_star_plan(start_xy, goal_xy, obslis_xy, vector_field):
     while path_num > 0:
         for i in range(max_iter):
             rnd_nd1 = get_random_node(x_min, x_max, y_min, y_max, goal_point)
-            rnd_nd2=get_random_node(x_min, x_max, y_min, y_max, start_point)
+            rnd_nd2 = get_random_node(x_min, x_max, y_min, y_max, start_point)
             near_index1 = get_nearest_node_index(node_list1, rnd_nd1)
             near_index2 = get_nearest_node_index(node_list2, rnd_nd2)
-            new_nd1 = vf_generate_new_node(node_list1[near_index1], rnd_nd1, extend_length, vector_field)
-            print("new_nd1:", new_nd1.x, new_nd1.y)
+            new_nd1 = vf_generate_new_node(node_list1[near_index1], rnd_nd1, extend_length, vector_field,
+                                           is_start_tree=True)
+            # print("new_nd1:", new_nd1.x, new_nd1.y)
             # 判断新节点1是否在地图内
-            if x_min >= new_nd1.x or new_nd1.x >= x_max or y_min >= new_nd1.y or new_nd1.y >= y_max:
+            if (x_min >= new_nd1.x or new_nd1.x >= x_max or y_min >= new_nd1.y or new_nd1.y >= y_max
+                    or new_nd1.x is None):
                 continue
-            new_nd2 = vf_generate_new_node(node_list2[near_index2], rnd_nd2, extend_length, vector_field)
-            print("new_nd2:", new_nd2.x, new_nd2.y)
+            new_nd2 = vf_generate_new_node(node_list2[near_index2], rnd_nd2, extend_length, vector_field,
+                                           is_start_tree=False)
+            # print("new_nd2:", new_nd2.x, new_nd2.y)
             # 判断新节点2是否在地图内
-            if x_min >= new_nd2.x or new_nd2.x >= x_max or y_min >= new_nd2.y or new_nd2.y >= y_max:
+            if (x_min >= new_nd2.x or new_nd2.x >= x_max or y_min >= new_nd2.y or new_nd2.y >= y_max
+                    or new_nd2.x is None):
                 continue
 
-            # TODO 转角约束
+            # 转角约束
+            if node_list1[near_index1 - 1] is not None and node_list2[near_index2 - 1] is not None:
+                degree1 = calc_triangle_deg(node_list1[near_index1], rnd_nd1, node_list1[near_index1 - 1])
+                degree2 = calc_triangle_deg(node_list2[near_index2], rnd_nd2, node_list2[near_index2 - 1])
+                if degree1 < mini_degree and degree1 != 0 and degree2 < mini_degree and degree2 != 0:
+                    continue
+
             if new_nd1 and not check_collision(new_nd1, node_list1[near_index1], obs_list):
-                print("right_new_nd1:", new_nd1.x, new_nd1.y)
+                # print("right_new_nd1:", new_nd1.x, new_nd1.y)
                 parent_index = rewrite_index(new_nd1, node_list1, obs_list)
                 new_nd1.parent = node_list1[parent_index]
                 node_list1.append(new_nd1)
@@ -188,7 +206,7 @@ def VF_Bi_RRT_star_plan(start_xy, goal_xy, obslis_xy, vector_field):
                 plt.plot(new_nd1.x, new_nd1.y, "xg")
                 plt.plot([new_nd1.parent.x, new_nd1.x], [new_nd1.parent.y, new_nd1.y], 'g')
             if new_nd2 and not check_collision(new_nd2, node_list2[near_index2], obs_list):
-                print("right_new_nd2:", new_nd2.x, new_nd2.y)
+                # print("right_new_nd2:", new_nd2.x, new_nd2.y)
                 parent_index = rewrite_index(new_nd2, node_list2, obs_list)
                 new_nd2.parent = node_list2[parent_index]
                 node_list2.append(new_nd2)
@@ -214,27 +232,30 @@ def VF_Bi_RRT_star_plan(start_xy, goal_xy, obslis_xy, vector_field):
                         path2.append([node.x, node.y])
                         node = node.parent
                     paths.append(path1 + path2)
-                    path_num -= 1
+                    # path_num -= 1
+                    break
 
             for node2 in node_list2:
                 if calc_p2p_dis(new_nd1, node2) <= extend_length and not check_collision(new_nd1, node2, obs_list):
                     path_found = True
-                    path1 = []
-                    node = new_nd1
-                    while node:
-                        path1.append([node.x, node.y])
-                        node = node.parent
-                    path1.reverse()
                     path2 = []
                     node = node2
                     while node:
                         path2.append([node.x, node.y])
                         node = node.parent
-                    paths.append(path1 + path2)
-                    path_num -= 1
+                    path2.reverse()
+                    path1 = []
+                    node = new_nd2
+                    while node:
+                        path2.append([node.x, node.y])
+                        node = node.parent
+                    paths.append(path2+path1)
+                    # path_num -= 1
+                    break
+
             # 找到路径后跳出循环并记录路径数量
             if path_found:
-                path_num-=1
+                path_num -= 1
                 break
 
     if paths:
