@@ -4,9 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b809a385-8e20-41df-b484-3d2583d0f90c" name="更改" comment="vf效果调试，终点树向量场方向相反">
+    <list default="true" id="b809a385-8e20-41df-b484-3d2583d0f90c" name="更改" comment="vf-RRT生成与剪枝，新点选取未优化">
       <change afterPath="$PROJECT_DIR$/../pythonProject/try.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/multi_planning/rrt_dwa.py" beforeDir="false" afterPath="$PROJECT_DIR$/multi_planning/rrt_dwa.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/multi_planning/vfrrt_dwa.py" beforeDir="false" afterPath="$PROJECT_DIR$/multi_planning/vfrrt_dwa.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/result_show/vfrrt_dwa_main.py" beforeDir="false" afterPath="$PROJECT_DIR$/result_show/vfrrt_dwa_main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/single_planning/DWA.py" beforeDir="false" afterPath="$PROJECT_DIR$/single_planning/DWA.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/single_planning/VF_Bi_RRT_star.py" beforeDir="false" afterPath="$PROJECT_DIR$/single_planning/VF_Bi_RRT_star.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -44,7 +48,7 @@
     "Python.rrt_dwa.executor": "Run",
     "Python.rrt_dwa_main.executor": "Run",
     "Python.rrt_main.executor": "Run",
-    "Python.vfrrt-dwa.executor": "Debug",
+    "Python.vfrrt-dwa.executor": "Run",
     "Python.vfrrt_dwa.executor": "ConcurrencyExecutor",
     "Python.vfrrt_dwa_main.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
@@ -55,7 +59,7 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "database.data.views.appearance",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -138,7 +142,7 @@
       <workItem from="1736135779938" duration="1603000" />
       <workItem from="1736489819800" duration="607000" />
       <workItem from="1736520004926" duration="1201000" />
-      <workItem from="1737943208164" duration="30216000" />
+      <workItem from="1737943208164" duration="45447000" />
     </task>
     <task id="LOCAL-00001" summary="剪枝&amp;避障正常（矩形&amp;圆形）&#10;star效果一般（感觉不如剪枝 不知道为什么">
       <option name="closed" value="true" />
@@ -180,7 +184,23 @@
       <option name="project" value="LOCAL" />
       <updated>1737948525976</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="vf-RRT生成与剪枝，新点选取未优化">
+      <option name="closed" value="true" />
+      <created>1737992898822</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1737992898822</updated>
+    </task>
+    <task id="LOCAL-00007" summary="vf-RRT生成与剪枝，新点选取未优化">
+      <option name="closed" value="true" />
+      <created>1737992910205</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1737992910205</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -215,33 +235,8 @@
     <MESSAGE value="dwa与rrt的方法优化与效果更新" />
     <MESSAGE value="vfrrt&amp;dwa初试，暂时效果不明显" />
     <MESSAGE value="vf效果调试，终点树向量场方向相反" />
-    <option name="LAST_COMMIT_MESSAGE" value="vf效果调试，终点树向量场方向相反" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/multi_planning/vfrrt_dwa.py</url>
-          <line>74</line>
-          <option name="timeStamp" value="54" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/single_planning/VF_Bi_RRT_star.py</url>
-          <line>124</line>
-          <option name="timeStamp" value="56" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/single_planning/VF_Bi_RRT_star.py</url>
-          <line>119</line>
-          <option name="timeStamp" value="57" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/single_planning/VF_Bi_RRT_star.py</url>
-          <line>159</line>
-          <option name="timeStamp" value="58" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
+    <MESSAGE value="vf-RRT生成与剪枝，新点选取未优化" />
+    <option name="LAST_COMMIT_MESSAGE" value="vf-RRT生成与剪枝，新点选取未优化" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Bi_RRT_star_main_py$RRT.coverage" NAME="RRT 覆盖结果" MODIFIED="1732766406528" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
@@ -249,7 +244,7 @@
     <SUITE FILE_PATH="coverage/DWA_py$rrt_main.coverage" NAME="rrt_main 覆盖结果" MODIFIED="1734169291391" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/result_show" />
     <SUITE FILE_PATH="coverage/Bi_RRT_star_main_py$dwa_test.coverage" NAME="dwa_test 覆盖结果" MODIFIED="1732767316374" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/DWA_py$main.coverage" NAME="main 覆盖结果" MODIFIED="1732782396759" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/result_show" />
-    <SUITE FILE_PATH="coverage/DWA_py$vfrrt_dwa.coverage" NAME="vfrrt-dwa 覆盖结果" MODIFIED="1737989628028" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/DWA_py$vfrrt_dwa.coverage" NAME="vfrrt-dwa 覆盖结果" MODIFIED="1738052086169" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/Bi_RRT_star_main_py$hello.coverage" NAME="hello 覆盖结果" MODIFIED="1731310219666" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/DWA_py$rrt_dwa_main.coverage" NAME="rrt_dwa_main 覆盖结果" MODIFIED="1735818177191" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/result_show" />
     <SUITE FILE_PATH="coverage/DWA_py$dwa_test.coverage" NAME="dwa_test 覆盖结果" MODIFIED="1734163820319" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />

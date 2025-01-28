@@ -115,8 +115,8 @@ def vf_prune_path(path, obs_list, vector_field):
                 score_jump = path_score(pruned_path + path[j:], vector_field)
                 # 计算路径评分——不跳
                 score_old = path_score(candidate_path, vector_field)
-                print("score_jump:", score_jump, " score_old:", score_old)
-                print("pruned_path:", pruned_path, " i:", i)
+                # print("score_jump:", score_jump, " score_old:", score_old)
+                # print("pruned_path:", pruned_path, " i:", i)
                 # Compare the scores,分数越小越好
                 if score_jump - score_old<=0 and score_jump != 0:
                     pruned_path.append(path[j])
@@ -132,7 +132,7 @@ def vf_prune_path(path, obs_list, vector_field):
 
 # 剪枝中的评分函数
 def path_score(path, vector_field):
-    print("score path:", path)
+    # print("score path:", path)
     # 累计diff 向量场方向与路径方向的差异
     total_difference = 0
     # 累计转角
@@ -173,11 +173,11 @@ def path_score(path, vector_field):
         # total_length /= 350
         # total_difference /= 150
         # total_angle /= 20
-        prize_length = 0.1
+        prize_length = 0.2
         prize_difference = 1
-        prize_angle = 0.1
+        prize_angle = 0.2
 
-    print("total_length:", total_length, " total_difference:", total_difference, " total_angle:", total_angle)
+    # print("total_length:", total_length, " total_difference:", total_difference, " total_angle:", total_angle)
     return total_difference * prize_difference + total_angle * prize_angle + total_length * prize_length
 
 
@@ -273,7 +273,7 @@ def VF_Bi_RRT_star_plan(start_xy, goal_xy, obslis_xy, vector_field):
                         path2.append([node.x, node.y])
                         node = node.parent
                     path=path1+path2
-                    print("上个路径：",path)
+                    # print("上个路径：",path)
                     paths.append(path)
                     # path_num -= 1
                     break
@@ -296,7 +296,7 @@ def VF_Bi_RRT_star_plan(start_xy, goal_xy, obslis_xy, vector_field):
                     path = path1 + path2
                     # path.reverse()
                     paths.append(path)
-                    print("这个路径 ",path)
+                    # print("这个路径 ",path)
                     # path_num -= 1
                     break
 
@@ -307,7 +307,7 @@ def VF_Bi_RRT_star_plan(start_xy, goal_xy, obslis_xy, vector_field):
 
     if paths:
         best_path = choose_lowest_cost(paths, vector_field)
-        print("best_path:", best_path)
+        # print("best_path:", best_path)
         pruned_path = vf_prune_path(best_path, obs_list, vector_field)
         return pruned_path
         # return best_path

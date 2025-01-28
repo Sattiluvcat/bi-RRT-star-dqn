@@ -50,16 +50,16 @@ def vf_rrt_dwa(start, goal, obstacles):
         'speed_cost_gain': 1.0,
         'robot_radius': 1.0,    # 机器人半径
         # 相对非vf的dwa增加的参数，考虑向量方向影响
-        'field_gain': 1.0
+        'field_gain': 0.5
     }
-
-    dwa = DWA(config)
-    x = np.array([start[0], start[1], 0.0, 0.0, 0.0])
-    path = [x[:2].copy()]
 
     # 生成向量场——范围稍大于图形范围
     X, Y, U, V = generate_vector_field((-20, 280), (-220, 20), 1)
     vector_feild = (X, Y, U, V)
+
+    dwa = DWA(config,vector_feild)
+    x = np.array([start[0], start[1], 0.0, 0.0, 0.0])
+    path = [x[:2].copy()]
 
     vf_rrt_path = VF_Bi_RRT_star_plan(start, goal, obstacles, vector_feild)
     print("vfrrtpath:", vf_rrt_path)
@@ -87,7 +87,7 @@ def vf_rrt_dwa(start, goal, obstacles):
             goal = np.array(vf_rrt_path[-1])
         else:
             goal = np.array(vf_rrt_path[rrt_index])
-        print("goal:", goal[0], goal[1])
+        # print("goal:", goal[0], goal[1])
         # 与下方找到最近路径点函数保持对应关系（不能比函数的参数大）
         while np.linalg.norm(x[:2] - goal) >= 8:
             update_obstacles(obstacles)  # Update the positions of the dynamic obstacles
@@ -98,11 +98,12 @@ def vf_rrt_dwa(start, goal, obstacles):
                     plot_obs_rec(obs[0], obs[1], obs[2], obs[3])
             print("now")
 
-            # Check for collision along the line to the goal
+            # Check for collision along the line to the goal，前方 10m 有障碍物则切换
             if not check_collision(Node(x[0], x[1]),
-                                   Node(x[0] + 25 * np.cos(np.arctan2(goal[1] - x[1], goal[0] - x[0])),
-                                        x[1] + 25 * np.sin(np.arctan2(goal[1] - x[1], goal[0] - x[0]))), obstacles):
+                                   Node(x[0] + 10 * np.cos(np.arctan2(goal[1] - x[1], goal[0] - x[0])),
+                                        x[1] + 10 * np.sin(np.arctan2(goal[1] - x[1], goal[0] - x[0]))), obstacles):
                 # No collision, move directly towards the goal
+                print("I'm out!")
                 direction = np.arctan2(goal[1] - x[1], goal[0] - x[0])
                 x[0] += config['max_speed'] * np.cos(direction)
                 x[1] += config['max_speed'] * np.sin(direction)
@@ -116,7 +117,7 @@ def vf_rrt_dwa(start, goal, obstacles):
 
             # Plot the path
             plt.plot([x for (x, y) in vf_rrt_path], [y for (x, y) in vf_rrt_path], 'y')
-            print("path:", path)
+            # print("path:", path)
             for p in path:
                 plt.plot(p[0], p[1], ".g")
             plt.axis([0, 260, -200, 10])
@@ -137,15 +138,15 @@ def vf_rrt_dwa(start, goal, obstacles):
                 break
             if np.linalg.norm(x[:2] - np.array(vf_rrt_path[-1])) < 10:  # Check if close to the final goal
                 break
-        # 最后十米没有障碍物直接到达 逻辑上有点问题 但是不重要
-        if np.linalg.norm(x[:2] - np.array(vf_rrt_path[-1])) < 10 and not obstacles_in_front(x, goal, obstacles):
+        # 最后 4 米没有障碍物直接到达 逻辑上有点问题 但是不重要
+        if np.linalg.norm(x[:2] - np.array(vf_rrt_path[-1])) < 4 and not obstacles_in_front(x, goal, obstacles):
             break
         last_goal_index = rrt_index
         if rrt_index == len(vf_rrt_path):
             rrt_index = len(vf_rrt_path)
         else:
             rrt_index = find_nearest_point_index(x, vf_rrt_path, last_goal_index)
-        print("rrtindex:", rrt_index)
+        # print("rrtindex:", rrt_index)
 
     # 最后十米没有障碍物直接到达
     if not obstacles_in_front(path[-1], vf_rrt_path[-1], obstacles) and np.linalg.norm(path[-1] - vf_rrt_path[-1]) < 10:
@@ -176,6 +177,6 @@ def vf_rrt_dwa(start, goal, obstacles):
     ani.save('output_animation.gif', writer='pillow')
     shutil.rmtree('plots')
 
-    print("path:", path)
+    # print("path:", path)
 
     return path, dwa, x, goal, obstacles, config, vf_rrt_path

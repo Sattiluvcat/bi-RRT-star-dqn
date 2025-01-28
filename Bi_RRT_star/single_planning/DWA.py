@@ -1,25 +1,21 @@
 import numpy as np
 
 from single_planning.Bi_RRT import check_collision, calc_p2l_xianduan_dis
+from single_planning.VF_Bi_RRT_star import get_vector_field
 from utils.node import Node
 
 
-# 计算与障碍物的最近距离
+# 计算与障碍物的最近距离 --> checkCollision
 def calc_obstacle_cost(trajectory, obstacles):
-    min_dis = float('inf')
-    # 根据config参数进行调整，当前取前1.5s的轨迹进行判断
-    for i in range(int(len(trajectory) / 10*3) - 1):
+    # 根据config参数进行调整，当前取前方 0.5s 的轨迹进行判断
+    print("trajectory:", trajectory)
+    # 直接从轨迹数组计算，前三个点
+    for i in range(2):
         start_pos = Node(trajectory[i, 0], trajectory[i, 1])
         end_pos = Node(trajectory[i + 1, 0], trajectory[i + 1, 1])
-        for obs in obstacles:
-            dis = calc_p2l_xianduan_dis(start_pos, end_pos, (obs[0], obs[1]))
-            if dis < obs[2]:  # obs[2] is the radius of the obstacle
-                dis = float('inf')  # the path intersects with the obstacle
-                return dis
-            else:
-                dis -= obs[2]  # the path is outside the obstacle
-            if dis < min_dis:
-                min_dis = dis
+        print("start_pos:", start_pos, " end_pos:", end_pos)
+        if check_collision(start_pos, end_pos, obstacles):
+            return float("inf")
     return 0
     # if check_collision(start_pos, end_pos, obstacles):
     #     return float("inf")  # collision
@@ -33,8 +29,9 @@ def calc_to_goal_cost(trajectory, goal):
 
 
 class DWA:
-    def __init__(self, config):
+    def __init__(self, config, vector_field=None):
         self.config = config
+        self.vector_field = vector_field
 
     def plan(self, x, goal, obstacles):
         # Dynamic Window [v_min, v_max, omega_min, omega_max]
@@ -72,18 +69,33 @@ class DWA:
                 to_goal_cost = self.config['to_goal_cost_gain'] * calc_to_goal_cost(trajectory, goal)
                 speed_cost = self.config['speed_cost_gain'] * (self.config['max_speed'] - trajectory[-1, 3])
                 ob_cost = calc_obstacle_cost(trajectory, obstacles)
-                # TODO 向量场的cost——vf时设置
-                field_cost=0
+                # 向量场的cost——vf时设置
+                field_cost = 0
+                if self.vector_field is not None:
+                    field_cost = self.config['field_gain'] * self.calc_vector_field_cost(trajectory)
 
                 # cost最小的轨迹
-                final_cost = to_goal_cost + speed_cost + ob_cost
-
+                final_cost = to_goal_cost + speed_cost*15 + ob_cost + field_cost
+                print("to_goal_cost:", to_goal_cost, " speed_cost:", speed_cost, " ob_cost:", ob_cost, " field_cost:",field_cost)
                 if min_cost > final_cost != float('inf'):
                     min_cost = final_cost
                     best_u = [v, y]
                     best_trajectory = trajectory
-
+        print("找到了一条好路")
         return best_u, best_trajectory
+
+    # 检查方法是否能评价向量场内轨迹
+    def calc_vector_field_cost(self, trajectory):
+        total_cost = 0
+        for point in trajectory:
+            x, y = point[0], point[1]
+            u, v = get_vector_field(x,y,self.vector_field)
+            if np.isnan(u) or np.isnan(v):
+                continue
+            direction_vector_field = np.arctan2(v, u)
+            direction_trajectory = np.arctan2(point[1] - trajectory[0][1], point[0] - trajectory[0][0])
+            total_cost += abs(direction_trajectory - direction_vector_field)
+        return total_cost
 
     def calc_trajectory(self, x_init, v, y):
         trajectory = np.array(x_init)

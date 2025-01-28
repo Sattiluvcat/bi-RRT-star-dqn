@@ -14,8 +14,9 @@ os.makedirs('plots', exist_ok=True)
 
 def update_obstacles(obstacles):
     for obs in obstacles:
-        obs[0] += np.random.uniform(0, 0.5)  # Randomly move the obstacle in x direction
-        obs[1] += np.random.uniform(0, 0.5)  # Randomly move the obstacle in y direction
+        # 向左下移动
+        obs[0] -= np.random.uniform(0, 0.5)  # Randomly move the obstacle in x direction
+        obs[1] -= np.random.uniform(0, 0.5)  # Randomly move the obstacle in y direction
 
 
 def rrt_dwa(start, goal_last, obstacles):
@@ -37,7 +38,9 @@ def rrt_dwa(start, goal_last, obstacles):
         'to_goal_cost_gain': 2.0,
         'speed_cost_gain': 1.0,
         # 机器人半径 没有用到的参数 可以改为到障碍物的距离
-        'robot_radius': 1.0
+        'robot_radius': 1.0,
+        # 向量场，此处恒为0
+        'field_gain': 1.0
     }
 
     dwa = DWA(config)
@@ -171,7 +174,7 @@ def rrt_dwa(start, goal_last, obstacles):
 
 def obstacles_in_front(x, goal, obstacles):
     x_pos = Node(x[0], x[1])
-    print("x_pos:", x_pos)  # Extract the position part of x
+    # print("x_pos:", x_pos)  # Extract the position part of x
     if check_collision(x_pos, goal, obstacles):
         return True
     return False
