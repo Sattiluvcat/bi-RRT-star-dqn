@@ -86,11 +86,11 @@ def Bi_RRT_star_plan(start_xy, goal_xy,
         for i in range(max_iter):
             # print(i)
             rnd_nd1 = get_random_node(x_min, x_max, y_min, y_max, goal_point)
-            rnd_nd2 = get_random_node(x_min, x_max, y_min, y_max, start_point)
+            # rnd_nd2 = get_random_node(x_min, x_max, y_min, y_max, start_point)
             near_index1 = get_nearest_node_index(node_list1, rnd_nd1)
-            near_index2 = get_nearest_node_index(node_list2, rnd_nd2)
+            # near_index2 = get_nearest_node_index(node_list2, rnd_nd2)
             new_nd1 = generate_new_node(node_list1[near_index1], rnd_nd1, extend_length)
-            new_nd2 = generate_new_node(node_list2[near_index2], rnd_nd2, extend_length)
+            # new_nd2 = generate_new_node(node_list2[near_index2], rnd_nd2, extend_length)
             # 转角限制
             # if node_list1[near_index1 - 1] != None and node_list2[near_index2 - 1] != None:
             #     degree1 = calc_triangle_deg(node_list1[near_index1], rnd_nd1, node_list1[near_index1 - 1])
@@ -112,63 +112,74 @@ def Bi_RRT_star_plan(start_xy, goal_xy,
                 plt.plot([new_nd1.parent.x, new_nd1.x], [new_nd1.parent.y, new_nd1.y], 'g')
             else:  # 若新节点与最近节点之间有障碍物，则跳过
                 continue
-            if new_nd2 is not None and check_collision(new_nd2, node_list2[near_index2], obs_list) == False:
-                parent_index = rewrite_index(new_nd2, node_list2, obs_list)
-                if parent_index is None:
-                    parent_index=near_index2
-                new_nd2.parent = node_list2[parent_index]
-                # node_list2 = node_list2[:(parent_index + 1)]
-                node_list2.append(new_nd2)
-                new_nd2.cost = new_nd2.parent.cost + calc_p2p_dis(new_nd2, new_nd2.parent)
-                rewire(new_nd2, node_list2, obs_list)
-
-                plt.plot(new_nd2.x, new_nd2.y, "xb")
-                plt.plot([new_nd2.parent.x, new_nd2.x], [new_nd2.parent.y, new_nd2.y], 'b')
-            else:
-                continue
+            # if new_nd2 is not None and check_collision(new_nd2, node_list2[near_index2], obs_list) == False:
+            #     parent_index = rewrite_index(new_nd2, node_list2, obs_list)
+            #     if parent_index is None:
+            #         parent_index=near_index2
+            #     new_nd2.parent = node_list2[parent_index]
+            #     # node_list2 = node_list2[:(parent_index + 1)]
+            #     node_list2.append(new_nd2)
+            #     new_nd2.cost = new_nd2.parent.cost + calc_p2p_dis(new_nd2, new_nd2.parent)
+            #     rewire(new_nd2, node_list2, obs_list)
+            #
+            #     plt.plot(new_nd2.x, new_nd2.y, "xb")
+            #     plt.plot([new_nd2.parent.x, new_nd2.x], [new_nd2.parent.y, new_nd2.y], 'b')
+            # else:
+            #     continue
             plt.axis("equal")
             plt.axis([0.0, 260.0, -200.0, 10.0])
-            for node1 in node_list1:
-                node2 = new_nd2
-                if calc_p2p_dis(node1, node2) <= extend_length and \
-                        check_collision(node1, node2, obs_list) == False:
-                    # 生成从起点到相交点的路径
-                    path1 = []
-                    node = node1
-                    while node is not None:
-                        path1.append([node.x, node.y])
-                        node = node.parent
-                    path1.reverse()  # 反转路径，使其从起点开始
-                    # 生成从终点到相交点的路径
-                    path2 = []
-                    node = node2
-                    while node is not None:
-                        path2.append([node.x, node.y])
-                        node = node.parent
-                    # 合并两条路径
-                    path = path1 + path2
-                    return path
-                    # return prune_path_degree(path, obs_list)
-            for node2 in node_list2:
-                node1 = new_nd1
-                if calc_p2p_dis(node1, node2) <= extend_length and \
-                        check_collision(node1, node2, obs_list) == False:
-                    # 生成从起点到相交点的路径
-                    path1 = []
-                    node = node1
-                    while node is not None:
-                        path1.append([node.x, node.y])
-                        node = node.parent
-                    path1.reverse()  # 反转路径，使其从起点开始
-                    # 生成从终点到相交点的路径
-                    path2 = []
-                    node = node2
-                    while node is not None:
-                        path2.append([node.x, node.y])
-                        node = node.parent
-                    # 合并两条路径
-                    path = path1 + path2
-                    return path
+            if calc_p2p_dis(new_nd1,goal_node)<extend_length and check_collision(new_nd1,goal_node,obs_list)==False:
+                node_list1.append(goal_node)
+                goal_node.parent=new_nd1
+                goal_node.cost=new_nd1.cost+calc_p2p_dis(new_nd1,goal_node)
+                path1 = []
+                node = goal_node
+                while node is not None:
+                    path1.append([node.x, node.y])
+                    node = node.parent
+                path1.reverse()
+                return path1
+            # for node1 in node_list1:
+            #     node2 = new_nd2
+            #     if calc_p2p_dis(node1, node2) <= extend_length and \
+            #             check_collision(node1, node2, obs_list) == False:
+            #         # 生成从起点到相交点的路径
+            #         path1 = []
+            #         node = node1
+            #         while node is not None:
+            #             path1.append([node.x, node.y])
+            #             node = node.parent
+            #         path1.reverse()  # 反转路径，使其从起点开始
+            #         # 生成从终点到相交点的路径
+            #         path2 = []
+            #         node = node2
+            #         while node is not None:
+            #             path2.append([node.x, node.y])
+            #             node = node.parent
+            #         # 合并两条路径
+            #         path = path1 + path2
+            #         return path
+            #         # return prune_path_degree(path, obs_list)
+            # for node2 in node_list2:
+            #     node1 = new_nd1
+            #     if calc_p2p_dis(node1, node2) <= extend_length and \
+            #             check_collision(node1, node2, obs_list) == False:
+            #         # 生成从起点到相交点的路径
+            #         path1 = []
+            #         node = node1
+            #         while node is not None:
+            #             path1.append([node.x, node.y])
+            #             node = node.parent
+            #         path1.reverse()  # 反转路径，使其从起点开始
+            #         # 生成从终点到相交点的路径
+            #         path2 = []
+            #         node = node2
+            #         while node is not None:
+            #             path2.append([node.x, node.y])
+            #             node = node.parent
+            #         # 合并两条路径
+            #         path = path1 + path2
+            #         return path
                     # return prune_path_degree(path, obs_list)
         return None
 
