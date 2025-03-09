@@ -4,13 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b809a385-8e20-41df-b484-3d2583d0f90c" name="更改" comment="转角限制与剪枝逻辑优化+试验环境搭建与测试">
-      <change afterPath="$PROJECT_DIR$/../doubanScore/score.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../pythonProject/try.py" afterDir="false" />
+    <list default="true" id="b809a385-8e20-41df-b484-3d2583d0f90c" name="更改" comment="rrt*版本">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/result_show/rrt_main.py" beforeDir="false" afterPath="$PROJECT_DIR$/result_show/rrt_main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/single_planning/Bi_RRT_star.py" beforeDir="false" afterPath="$PROJECT_DIR$/single_planning/Bi_RRT_star.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/single_planning/VF_Bi_RRT_star.py" beforeDir="false" afterPath="$PROJECT_DIR$/single_planning/VF_Bi_RRT_star.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -27,6 +23,7 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+    <option name="RESET_MODE" value="MIXED" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 0
@@ -179,7 +176,7 @@
       <workItem from="1741241207391" duration="12151000" />
       <workItem from="1741257649180" duration="119000" />
       <workItem from="1741354918336" duration="292000" />
-      <workItem from="1741499364149" duration="3979000" />
+      <workItem from="1741499364149" duration="7615000" />
     </task>
     <task id="LOCAL-00001" summary="剪枝&amp;避障正常（矩形&amp;圆形）&#10;star效果一般（感觉不如剪枝 不知道为什么">
       <option name="closed" value="true" />
@@ -253,7 +250,39 @@
       <option name="project" value="LOCAL" />
       <updated>1741500310154</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="重布线修改">
+      <option name="closed" value="true" />
+      <created>1741508707760</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1741508707760</updated>
+    </task>
+    <task id="LOCAL-00011" summary="bi-rrt*版本">
+      <option name="closed" value="true" />
+      <created>1741510517808</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1741510517808</updated>
+    </task>
+    <task id="LOCAL-00012" summary="rrt*版本">
+      <option name="closed" value="true" />
+      <created>1741511274946</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1741511274946</updated>
+    </task>
+    <task id="LOCAL-00013" summary="rrt*版本">
+      <option name="closed" value="true" />
+      <created>1741511365760</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1741511365760</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -291,18 +320,10 @@
     <MESSAGE value="vf-RRT生成与剪枝，新点选取未优化" />
     <MESSAGE value="vf-RRT-DWA结束，新点选取未按vfrrt实现" />
     <MESSAGE value="转角限制与剪枝逻辑优化+试验环境搭建与测试" />
-    <option name="LAST_COMMIT_MESSAGE" value="转角限制与剪枝逻辑优化+试验环境搭建与测试" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/single_planning/Bi_RRT_star.py</url>
-          <line>15</line>
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
+    <MESSAGE value="重布线修改" />
+    <MESSAGE value="bi-rrt*版本" />
+    <MESSAGE value="rrt*版本" />
+    <option name="LAST_COMMIT_MESSAGE" value="rrt*版本" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Bi_RRT_star_main_py$RRT.coverage" NAME="RRT 覆盖结果" MODIFIED="1732766406528" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
@@ -320,6 +341,6 @@
     <SUITE FILE_PATH="coverage/RRT_py$Bi_RRT_star_main.coverage" NAME="Bi_RRT_star_main 覆盖结果" MODIFIED="1731034386494" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Bi_RRT_star_main_py$Bi_RRT_star_main.coverage" NAME="Bi_RRT_star_main 覆盖结果" MODIFIED="1732765342774" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/RRT_py$RRT.coverage" NAME="RRT 覆盖结果" MODIFIED="1731034518018" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/DWA_py$bi_rrt_pruned.coverage" NAME="bi-rrt-pruned 覆盖结果" MODIFIED="1741508479934" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/DWA_py$bi_rrt_pruned.coverage" NAME="bi-rrt-pruned 覆盖结果" MODIFIED="1741511856132" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
   </component>
 </project>

@@ -1,9 +1,10 @@
 # rrt样例
 import time
 import pandas as pd
+import pyttsx3
 from matplotlib import pyplot as plt
 
-from single_planning.Bi_RRT import calc_path_length, calc_triangle_deg, plot_obs, plot_obs_rec
+from single_planning.Bi_RRT import calc_path_length, calc_triangle_deg, plot_obs, plot_obs_rec, RRT_plan
 from single_planning.Bi_RRT_star import Bi_RRT_star_plan
 
 
@@ -32,8 +33,8 @@ def run_bi_rrt_multiple_times(start, goal, obstacle_list, num_runs=100):
             results.append([run_time, None, None, None])
 
     df = pd.DataFrame(results, columns=['Run Time (s)', 'Path Length (m)', 'Total Angle (°)', 'Max Angle (°)'])
-    df.to_excel('bi_rrt_star_prune_results.xlsx', index=False)
-    print("Results saved to bi_rrt_star_prune_results.xlsx")
+    df.to_excel('results.xlsx', index=False)
+    print("Results saved to results.xlsx")
 
     # Plot all paths
     plt.figure()
@@ -112,3 +113,6 @@ if __name__ == "__main__":
     #     elif len(obs) == 4:
     #         plot_obs_rec(obs[0], obs[1], obs[2], obs[3])
     # plt.show()
+    engine=pyttsx3.init()
+    engine.say("The path has been planned successfully")
+    engine.runAndWait()
