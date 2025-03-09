@@ -33,7 +33,7 @@ def run_bi_rrt_multiple_times(start, goal, obstacle_list, num_runs=100):
 
     df = pd.DataFrame(results, columns=['Run Time (s)', 'Path Length (m)', 'Total Angle (°)', 'Max Angle (°)'])
     df.to_excel('bi_rrt_star_prune_results.xlsx', index=False)
-    print("Results saved to bi_rrt_star_results.xlsx")
+    print("Results saved to bi_rrt_star_prune_results.xlsx")
 
     # Plot all paths
     plt.figure()
@@ -42,7 +42,7 @@ def run_bi_rrt_multiple_times(start, goal, obstacle_list, num_runs=100):
     plt.plot(start[0], start[1], "xk")
     plt.plot(goal[0], goal[1], "xk")
     plt.axis("equal")
-    plt.axis([0, 260, -200, 50])
+    plt.axis([0, 260, -200, 20])
     for obs in obstacle_list:
         if len(obs) == 3:
             plot_obs(obs[0], obs[1], obs[2])

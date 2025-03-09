@@ -4,12 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b809a385-8e20-41df-b484-3d2583d0f90c" name="更改" comment="">
+    <list default="true" id="b809a385-8e20-41df-b484-3d2583d0f90c" name="更改" comment="转角限制与剪枝逻辑优化+试验环境搭建与测试">
       <change afterPath="$PROJECT_DIR$/../doubanScore/score.py" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/../pythonProject/try.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/result_show/rrt_main.py" beforeDir="false" afterPath="$PROJECT_DIR$/result_show/rrt_main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/single_planning/Bi_RRT.py" beforeDir="false" afterPath="$PROJECT_DIR$/single_planning/Bi_RRT.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/single_planning/Bi_RRT_star.py" beforeDir="false" afterPath="$PROJECT_DIR$/single_planning/Bi_RRT_star.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/single_planning/VF_Bi_RRT_star.py" beforeDir="false" afterPath="$PROJECT_DIR$/single_planning/VF_Bi_RRT_star.py" afterDir="false" />
     </list>
@@ -180,7 +179,7 @@
       <workItem from="1741241207391" duration="12151000" />
       <workItem from="1741257649180" duration="119000" />
       <workItem from="1741354918336" duration="292000" />
-      <workItem from="1741499364149" duration="429000" />
+      <workItem from="1741499364149" duration="3979000" />
     </task>
     <task id="LOCAL-00001" summary="剪枝&amp;避障正常（矩形&amp;圆形）&#10;star效果一般（感觉不如剪枝 不知道为什么">
       <option name="closed" value="true" />
@@ -246,7 +245,15 @@
       <option name="project" value="LOCAL" />
       <updated>1738052571829</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="转角限制与剪枝逻辑优化+试验环境搭建与测试">
+      <option name="closed" value="true" />
+      <created>1741500310154</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1741500310154</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -283,14 +290,26 @@
     <MESSAGE value="vf效果调试，终点树向量场方向相反" />
     <MESSAGE value="vf-RRT生成与剪枝，新点选取未优化" />
     <MESSAGE value="vf-RRT-DWA结束，新点选取未按vfrrt实现" />
-    <option name="LAST_COMMIT_MESSAGE" value="vf-RRT-DWA结束，新点选取未按vfrrt实现" />
+    <MESSAGE value="转角限制与剪枝逻辑优化+试验环境搭建与测试" />
+    <option name="LAST_COMMIT_MESSAGE" value="转角限制与剪枝逻辑优化+试验环境搭建与测试" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/single_planning/Bi_RRT_star.py</url>
+          <line>15</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Bi_RRT_star_main_py$RRT.coverage" NAME="RRT 覆盖结果" MODIFIED="1732766406528" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/DWA_py$vfrrt_dwa_main.coverage" NAME="vfrrt_dwa_main 覆盖结果" MODIFIED="1735975607798" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/result_show" />
     <SUITE FILE_PATH="coverage/DWA_py$rrt_main.coverage" NAME="rrt_main 覆盖结果" MODIFIED="1741173547229" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/result_show" />
-    <SUITE FILE_PATH="coverage/Bi_RRT_star_main_py$dwa_test.coverage" NAME="dwa_test 覆盖结果" MODIFIED="1732767316374" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/DWA_py$main.coverage" NAME="main 覆盖结果" MODIFIED="1732782396759" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/result_show" />
+    <SUITE FILE_PATH="coverage/Bi_RRT_star_main_py$dwa_test.coverage" NAME="dwa_test 覆盖结果" MODIFIED="1732767316374" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/DWA_py$vfrrt_dwa.coverage" NAME="vfrrt-dwa 覆盖结果" MODIFIED="1738052086169" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/Bi_RRT_star_main_py$hello.coverage" NAME="hello 覆盖结果" MODIFIED="1731310219666" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/DWA_py$rrt_dwa_main.coverage" NAME="rrt_dwa_main 覆盖结果" MODIFIED="1735818177191" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/result_show" />
@@ -301,6 +320,6 @@
     <SUITE FILE_PATH="coverage/RRT_py$Bi_RRT_star_main.coverage" NAME="Bi_RRT_star_main 覆盖结果" MODIFIED="1731034386494" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Bi_RRT_star_main_py$Bi_RRT_star_main.coverage" NAME="Bi_RRT_star_main 覆盖结果" MODIFIED="1732765342774" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/RRT_py$RRT.coverage" NAME="RRT 覆盖结果" MODIFIED="1731034518018" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/DWA_py$bi_rrt_pruned.coverage" NAME="bi-rrt-pruned 覆盖结果" MODIFIED="1741355059455" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/DWA_py$bi_rrt_pruned.coverage" NAME="bi-rrt-pruned 覆盖结果" MODIFIED="1741508479934" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
   </component>
 </project>

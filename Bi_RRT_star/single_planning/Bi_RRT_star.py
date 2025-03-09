@@ -11,6 +11,10 @@ def rewrite_index(node_new, node_list, obstacle_list):
     # grand_node=
     for i, node in enumerate(node_list):
         if calc_p2p_dis(node_new, node) < r and not check_collision(node_new, node, obstacle_list):
+            if node.parent is not None:
+                degree=calc_triangle_deg(node,node_new,node.parent)
+                if degree<90:
+                    continue
             potential_cost = node.cost + calc_p2p_dis(node_new, node)
             if potential_cost < min_cost:
                 min_cost = potential_cost
@@ -37,6 +41,10 @@ def rewire(node_new, node_list, obstacle_list):
     for node in node_list:
         if (node != node_new.parent and calc_p2p_dis(node_new, node) < r
                 and not check_collision(node_new, node, obstacle_list)):
+            if node_new.parent is not None:
+                degree = calc_triangle_deg(node_new, node, node_new.parent)
+                if degree < 90:
+                    continue
             potential_cost = node_new.cost + calc_p2p_dis(node, node_new)
             # 下面这个限定到底要不要👇
             # if potential_cost < node.cost and check_collision(node, node_new, obstacle_list) is False:
@@ -87,11 +95,13 @@ def Bi_RRT_star_plan(start_xy, goal_xy,
             if node_list1[near_index1 - 1] != None and node_list2[near_index2 - 1] != None:
                 degree1 = calc_triangle_deg(node_list1[near_index1], rnd_nd1, node_list1[near_index1 - 1])
                 degree2 = calc_triangle_deg(node_list2[near_index2], rnd_nd2, node_list2[near_index2 - 1])
-                if degree1 < mini_degree and degree1 != 0 and degree2 < mini_degree and degree2 != 0:
+                if (degree1 < mini_degree and degree1 != 0) or (degree2 < mini_degree and degree2 != 0):
                     continue
             # 重布线与重写操作效果检验
             if new_nd1 is not None and check_collision(new_nd1, node_list1[near_index1], obs_list) == False:
                 parent_index = rewrite_index(new_nd1, node_list1, obs_list)
+                if parent_index is None:
+                    parent_index=near_index1
                 new_nd1.parent = node_list1[parent_index]
                 # node_list1.pop(near_index1)
                 node_list1.append(new_nd1)
@@ -104,6 +114,8 @@ def Bi_RRT_star_plan(start_xy, goal_xy,
                 continue
             if new_nd2 is not None and check_collision(new_nd2, node_list2[near_index2], obs_list) == False:
                 parent_index = rewrite_index(new_nd2, node_list2, obs_list)
+                if parent_index is None:
+                    parent_index=near_index2
                 new_nd2.parent = node_list2[parent_index]
                 # node_list2 = node_list2[:(parent_index + 1)]
                 node_list2.append(new_nd2)

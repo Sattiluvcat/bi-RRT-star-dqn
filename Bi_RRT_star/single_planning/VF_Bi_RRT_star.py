@@ -104,7 +104,7 @@ def vf_prune_path(path, obs_list, vector_field):
             # 转角约束
             if i > 0:
                 # 这里转角之前定义错了
-                degree = calc_triangle_deg(path[i], path[i-1], path[j])
+                degree = calc_triangle_deg(path[i], path[i - 1], path[j])
                 if degree < mini_degree and degree != 0:
                     continue
             # 碰撞约束
@@ -118,7 +118,7 @@ def vf_prune_path(path, obs_list, vector_field):
                 # print("score_jump:", score_jump, " score_old:", score_old)
                 # print("pruned_path:", pruned_path, " i:", i)
                 # Compare the scores,分数越小越好
-                if score_jump - score_old<=0 and score_jump != 0:
+                if score_jump - score_old <= 0 and score_jump != 0:
                     pruned_path.append(path[j])
                     i = j
                     found = True
@@ -189,7 +189,7 @@ def VF_Bi_RRT_star_plan(start_xy, goal_xy, obslis_xy, vector_field):
     start_point = start_xy
     goal_point = goal_xy
     obs_list = obslis_xy
-    extend_length = 5       # TODO：要走迷宫的话改为10，rewrite里的半径改为15
+    extend_length = 5  # TODO：要走迷宫的话改为10，rewrite里的半径改为15
     max_iter = 10000
     mini_degree = 90  # 最大转角，180°-mini_degree，反着定义
     # 路径总数
@@ -209,7 +209,7 @@ def VF_Bi_RRT_star_plan(start_xy, goal_xy, obslis_xy, vector_field):
     path_found = False
 
     while path_num > 0:
-        path_found=False
+        path_found = False
         for i in range(max_iter):
             rnd_nd1 = get_random_node(x_min, x_max, y_min, y_max, goal_point)
             rnd_nd2 = get_random_node(x_min, x_max, y_min, y_max, start_point)
@@ -234,14 +234,16 @@ def VF_Bi_RRT_star_plan(start_xy, goal_xy, obslis_xy, vector_field):
             if node_list1[near_index1 - 1] is not None and node_list2[near_index2 - 1] is not None:
                 degree1 = calc_triangle_deg(node_list1[near_index1], rnd_nd1, node_list1[near_index1 - 1])
                 degree2 = calc_triangle_deg(node_list2[near_index2], rnd_nd2, node_list2[near_index2 - 1])
-                if degree1 < mini_degree and degree1 != 0 and degree2 < mini_degree and degree2 != 0:
+                if degree1 < mini_degree and degree1 != 0 or degree2 < mini_degree and degree2 != 0:
                     continue
-            else:
-                continue
+            # else:
+            #     continue
 
             if new_nd1 and not check_collision(new_nd1, node_list1[near_index1], obs_list):
                 # print("right_new_nd1:", new_nd1.x, new_nd1.y)
                 parent_index = rewrite_index(new_nd1, node_list1, obs_list)
+                if parent_index is None:
+                    parent_index = near_index1
                 new_nd1.parent = node_list1[parent_index]
                 node_list1.append(new_nd1)
                 new_nd1.cost = new_nd1.parent.cost + calc_p2p_dis(new_nd1, new_nd1.parent)
@@ -253,6 +255,8 @@ def VF_Bi_RRT_star_plan(start_xy, goal_xy, obslis_xy, vector_field):
             if new_nd2 and not check_collision(new_nd2, node_list2[near_index2], obs_list):
                 # print("right_new_nd2:", new_nd2.x, new_nd2.y)
                 parent_index = rewrite_index(new_nd2, node_list2, obs_list)
+                if parent_index is None:
+                    parent_index = near_index2
                 new_nd2.parent = node_list2[parent_index]
                 node_list2.append(new_nd2)
                 new_nd2.cost = new_nd2.parent.cost + calc_p2p_dis(new_nd2, new_nd2.parent)
@@ -278,7 +282,7 @@ def VF_Bi_RRT_star_plan(start_xy, goal_xy, obslis_xy, vector_field):
                     while node:
                         path2.append([node.x, node.y])
                         node = node.parent
-                    path=path1+path2
+                    path = path1 + path2
                     # print("上个路径：",path)
                     paths.append(path)
                     # path_num -= 1
