@@ -183,6 +183,34 @@ def prune_path(path, obs_list):
     return pruned_path
 
 
+# 转角约束版剪枝
+def prune_path_degree(path, obs_list):
+    mini_degree = 90  # 最大转角，180°-mini_degree，反着定义
+    pruned_path = [path[0]]
+    i = 0
+
+    while i < len(path) - 1:
+        found = False
+        for j in range(len(path) - 1, i, -1):
+            # 转角约束
+            if i > 0:
+                # 这里转角之前定义错了
+                degree = calc_triangle_deg(path[i], path[i - 1], path[j])
+                if degree < mini_degree and degree != 0:
+                    continue
+            # 碰撞约束
+            if not check_collision(path[i], path[j], obs_list):
+                pruned_path.append(path[j])
+                i = j
+                found = True
+                break
+        if not found:
+            i += 1
+    if pruned_path[-1] != path[-1]:
+        pruned_path.append(path[-1])
+    return pruned_path
+
+
 def RRT_plan(start_xy, goal_xy,
              obslis_xy):
     print("起始点：")
@@ -196,9 +224,9 @@ def RRT_plan(start_xy, goal_xy,
     start_point = start_xy
     goal_point = goal_xy
     obs_list = obslis_xy
-    extend_length = 5
+    extend_length = 10
     mini_degree = 90
-    max_iter = 10000
+    max_iter = 50000
     start_node = Node(start_point[0], start_point[1])
     goal_node = Node(goal_point[0], goal_point[1])
     node_list1 = [start_node]  # 从起点开始的树
@@ -209,71 +237,89 @@ def RRT_plan(start_xy, goal_xy,
         return path
     else:
         for i in range(max_iter):
-            rnd_nd = get_random_node(x_min, x_max, y_min, y_max, goal_point)
-            near_index1 = get_nearest_node_index(node_list1, rnd_nd)
-            near_index2 = get_nearest_node_index(node_list2, rnd_nd)
-            new_nd1 = generate_new_node(node_list1[near_index1], rnd_nd, extend_length)
-            new_nd2 = generate_new_node(node_list2[near_index2], rnd_nd, extend_length)
+            rnd_nd1 = get_random_node(x_min, x_max, y_min, y_max, goal_point)
+            # rnd_nd2 = get_random_node(x_min, x_max, y_min, y_max, start_point)
+            near_index1 = get_nearest_node_index(node_list1, rnd_nd1)
+            # near_index2 = get_nearest_node_index(node_list2, rnd_nd2)
+            new_nd1 = generate_new_node(node_list1[near_index1], rnd_nd1, extend_length)
+            # new_nd2 = generate_new_node(node_list2[near_index2], rnd_nd2, extend_length)
             # 转角约束
-            if node_list1[near_index1 - 1] is not None and node_list2[near_index2 - 1] is not None:
-                degree1 = calc_triangle_deg(node_list1[near_index1], rnd_nd, node_list1[near_index1 - 1])
-                degree2 = calc_triangle_deg(node_list2[near_index2], rnd_nd, node_list2[near_index2 - 1])
-                if degree1 < mini_degree and degree1 != 0 and degree2 < mini_degree and degree2 != 0:
+            # if node_list1[near_index1 - 1] is not None and node_list2[near_index2 - 1] is not None:
+            if node_list1[near_index1 - 1] is not None:
+                degree1 = calc_triangle_deg(node_list1[near_index1], rnd_nd1, node_list1[near_index1 - 1])
+                # degree2 = calc_triangle_deg(node_list2[near_index2], rnd_nd, node_list2[near_index2 - 1])
+                # if degree1 < mini_degree and degree1 != 0 and degree2 < mini_degree and degree2 != 0:
+                if degree1 < mini_degree and degree1 != 0:
                     continue
             if new_nd1 is not None and check_collision(new_nd1, node_list1[near_index1], obs_list) == False:
                 new_nd1.parent = node_list1[near_index1]
                 node_list1.append(new_nd1)
                 plt.plot(new_nd1.x, new_nd1.y, "xg")
                 plt.plot([new_nd1.parent.x, new_nd1.x], [new_nd1.parent.y, new_nd1.y], 'g')
-            if new_nd2 is not None and check_collision(new_nd2, node_list2[near_index2], obs_list) == False:
-                new_nd2.parent = node_list2[near_index2]
-                node_list2.append(new_nd2)
-                plt.plot(new_nd2.x, new_nd2.y, "xb")
-                plt.plot([new_nd2.parent.x, new_nd2.x], [new_nd2.parent.y, new_nd2.y], 'b')
+            else:
+                continue
+            # if new_nd2 is not None and check_collision(new_nd2, node_list2[near_index2], obs_list) == False:
+            #     new_nd2.parent = node_list2[near_index2]
+            #     node_list2.append(new_nd2)
+            #     plt.plot(new_nd2.x, new_nd2.y, "xb")
+            #     plt.plot([new_nd2.parent.x, new_nd2.x], [new_nd2.parent.y, new_nd2.y], 'b')
+            # else:
+            #     continue
             plt.axis("equal")
             plt.axis([0.0, 260.0, -200.0, 10.0])
-            for node1 in node_list1:
-                node2 = new_nd2
-                if calc_p2p_dis(node1, node2) <= extend_length and \
-                        check_collision(node1, node2, obs_list) == False:
-                    # 生成从起点到相交点的路径
-                    path1 = []
-                    node = node1
-                    while node is not None:
-                        path1.append([node.x, node.y])
-                        node = node.parent
-                    path1.reverse()  # 反转路径，使其从起点开始
-                    # 生成从终点到相交点的路径
-                    path2 = []
-                    node = node2
-                    while node is not None:
-                        path2.append([node.x, node.y])
-                        node = node.parent
-                    # 合并两条路径
-                    path = path1 + path2
-                    # return path
-                    return prune_path(path, obs_list)
-            for node2 in node_list2:
-                node1 = new_nd1
-                if calc_p2p_dis(node1, node2) <= extend_length and \
-                        check_collision(node1, node2, obs_list) == False:
-                    # 生成从起点到相交点的路径
-                    path1 = []
-                    node = node1
-                    while node is not None:
-                        path1.append([node.x, node.y])
-                        node = node.parent
-                    path1.reverse()  # 反转路径，使其从起点开始
-                    # 生成从终点到相交点的路径
-                    path2 = []
-                    node = node2
-                    while node is not None:
-                        path2.append([node.x, node.y])
-                        node = node.parent
-                    # 合并两条路径
-                    path = path1 + path2
-                    # return path
-                    return prune_path(path, obs_list)
+            if (calc_p2p_dis(new_nd1, goal_node) <= extend_length and
+                    check_collision(new_nd1, goal_node, obs_list) == False):
+                # 生成从起点到相交点的路径
+                goal_node.parent = new_nd1
+                path1 = []
+                node = goal_node
+                while node is not None:
+                    path1.append([node.x, node.y])
+                    node = node.parent
+                path1.reverse()
+                return path1
+            # for node1 in node_list1:
+            #     node2 = new_nd2
+            #     if calc_p2p_dis(node1, node2) <= extend_length and \
+            #             check_collision(node1, node2, obs_list) == False:
+            #         # 生成从起点到相交点的路径
+            #         path1 = []
+            #         node = node1
+            #         while node is not None:
+            #             path1.append([node.x, node.y])
+            #             node = node.parent
+            #         path1.reverse()  # 反转路径，使其从起点开始
+            #         # 生成从终点到相交点的路径
+            #         path2 = []
+            #         node = node2
+            #         while node is not None:
+            #             path2.append([node.x, node.y])
+            #             node = node.parent
+            #         # 合并两条路径
+            #         path = path1 + path2
+            #         # return path
+            #         return prune_path(path, obs_list)
+            # for node2 in node_list2:
+            #     node1 = new_nd1
+            #     if calc_p2p_dis(node1, node2) <= extend_length and \
+            #             check_collision(node1, node2, obs_list) == False:
+            #         # 生成从起点到相交点的路径
+            #         path1 = []
+            #         node = node1
+            #         while node is not None:
+            #             path1.append([node.x, node.y])
+            #             node = node.parent
+            #         path1.reverse()  # 反转路径，使其从起点开始
+            #         # 生成从终点到相交点的路径
+            #         path2 = []
+            #         node = node2
+            #         while node is not None:
+            #             path2.append([node.x, node.y])
+            #             node = node.parent
+            #         # 合并两条路径
+            #         path = path1 + path2
+            #         # return path
+            #         return prune_path(path, obs_list)
         return None
 
 
@@ -334,6 +380,7 @@ def plot_obs(x, y, size, color="-b"):  # pragma: no cover
     yl = [y + size * math.sin(math.radians(d)) for d in deg]
     plt.plot(xl, yl, color)
 
+
 # 画方
 def plot_obs_rec(x1, y1, x2, y2, color="-b"):
     xl = [x1, x2, x2, x1, x1]
@@ -346,12 +393,15 @@ def path_score(path, all_time, obs_list):
     print("路径总长：", calc_path_length(path), "m")
     length = calc_path_length(path)
     total_angle = 0
+    max_angle = 0
     if len(path) >= 3:
         for i in range(len(path) - 2):
             total_angle += abs(180 - calc_triangle_deg(path[i + 1], path[i], path[i + 2]))
+            max_angle = max(max_angle, abs(180 - calc_triangle_deg(path[i + 1], path[i], path[i + 2])))
     else:
         total_angle = 0
     print("累积转角：", total_angle, "°")
+    print("最大转角：", max_angle, "°")
     min_dis = float('inf')
     obstacle_list = obs_list
     # obstacle_list = [[latlon_to_xy(obstacle[1], obstacle[0])[0],

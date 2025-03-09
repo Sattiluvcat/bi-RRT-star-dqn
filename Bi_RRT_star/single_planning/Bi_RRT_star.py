@@ -5,10 +5,10 @@ from utils.node import Node
 
 
 def rewrite_index(node_new, node_list, obstacle_list):
-    r = 8  # Define search radius
+    r = 15  # Define search radius,要跟步长匹配
     min_cost = float('inf')
     min_node_index = None
-
+    # grand_node=
     for i, node in enumerate(node_list):
         if calc_p2p_dis(node_new, node) < r and not check_collision(node_new, node, obstacle_list):
             potential_cost = node.cost + calc_p2p_dis(node_new, node)
@@ -35,7 +35,8 @@ def rewire(node_new, node_list, obstacle_list):
     r = 30  # Define search radius
 
     for node in node_list:
-        if node != node_new.parent and calc_p2p_dis(node_new, node) < r:
+        if (node != node_new.parent and calc_p2p_dis(node_new, node) < r
+                and not check_collision(node_new, node, obstacle_list)):
             potential_cost = node_new.cost + calc_p2p_dis(node, node_new)
             # 下面这个限定到底要不要👇
             # if potential_cost < node.cost and check_collision(node, node_new, obstacle_list) is False:
@@ -62,9 +63,9 @@ def Bi_RRT_star_plan(start_xy, goal_xy,
     start_point = start_xy
     goal_point = goal_xy
     obs_list = obslis_xy
-    extend_length = 5
-    # mini_degree = 90
-    max_iter = 10000
+    extend_length = 10
+    mini_degree = 90
+    max_iter = 50000
     start_node = Node(start_point[0], start_point[1])
     goal_node = Node(goal_point[0], goal_point[1])
     node_list1 = [start_node]  # 从起点开始的树
@@ -76,16 +77,18 @@ def Bi_RRT_star_plan(start_xy, goal_xy,
     else:
         for i in range(max_iter):
             # print(i)
-            rnd_nd = get_random_node(x_min, x_max, y_min, y_max, goal_point)
-            near_index1 = get_nearest_node_index(node_list1, rnd_nd)
-            near_index2 = get_nearest_node_index(node_list2, rnd_nd)
-            new_nd1 = generate_new_node(node_list1[near_index1], rnd_nd, extend_length)
-            new_nd2 = generate_new_node(node_list2[near_index2], rnd_nd, extend_length)
-            # if node_list1[near_index1 - 1] != None and node_list2[near_index2 - 1] != None:
-            #     degree1 = calc_triangle_deg(node_list1[near_index1], rnd_nd, node_list1[near_index1 - 1])
-            #     degree2 = calc_triangle_deg(node_list2[near_index2], rnd_nd, node_list2[near_index2 - 1])
-            #     if degree1 < mini_degree and degree1 != 0 and degree2 < mini_degree and degree2 != 0:
-            #         continue
+            rnd_nd1 = get_random_node(x_min, x_max, y_min, y_max, goal_point)
+            rnd_nd2 = get_random_node(x_min, x_max, y_min, y_max, start_point)
+            near_index1 = get_nearest_node_index(node_list1, rnd_nd1)
+            near_index2 = get_nearest_node_index(node_list2, rnd_nd2)
+            new_nd1 = generate_new_node(node_list1[near_index1], rnd_nd1, extend_length)
+            new_nd2 = generate_new_node(node_list2[near_index2], rnd_nd2, extend_length)
+            # 转角限制
+            if node_list1[near_index1 - 1] != None and node_list2[near_index2 - 1] != None:
+                degree1 = calc_triangle_deg(node_list1[near_index1], rnd_nd1, node_list1[near_index1 - 1])
+                degree2 = calc_triangle_deg(node_list2[near_index2], rnd_nd2, node_list2[near_index2 - 1])
+                if degree1 < mini_degree and degree1 != 0 and degree2 < mini_degree and degree2 != 0:
+                    continue
             # 重布线与重写操作效果检验
             if new_nd1 is not None and check_collision(new_nd1, node_list1[near_index1], obs_list) == False:
                 parent_index = rewrite_index(new_nd1, node_list1, obs_list)
@@ -97,6 +100,8 @@ def Bi_RRT_star_plan(start_xy, goal_xy,
 
                 plt.plot(new_nd1.x, new_nd1.y, "xg")
                 plt.plot([new_nd1.parent.x, new_nd1.x], [new_nd1.parent.y, new_nd1.y], 'g')
+            else:  # 若新节点与最近节点之间有障碍物，则跳过
+                continue
             if new_nd2 is not None and check_collision(new_nd2, node_list2[near_index2], obs_list) == False:
                 parent_index = rewrite_index(new_nd2, node_list2, obs_list)
                 new_nd2.parent = node_list2[parent_index]
@@ -107,6 +112,8 @@ def Bi_RRT_star_plan(start_xy, goal_xy,
 
                 plt.plot(new_nd2.x, new_nd2.y, "xb")
                 plt.plot([new_nd2.parent.x, new_nd2.x], [new_nd2.parent.y, new_nd2.y], 'b')
+            else:
+                continue
             plt.axis("equal")
             plt.axis([0.0, 260.0, -200.0, 10.0])
             for node1 in node_list1:
@@ -129,7 +136,7 @@ def Bi_RRT_star_plan(start_xy, goal_xy,
                     # 合并两条路径
                     path = path1 + path2
                     # return path
-                    return prune_path(path, obs_list)
+                    return prune_path_degree(path, obs_list)
             for node2 in node_list2:
                 node1 = new_nd1
                 if calc_p2p_dis(node1, node2) <= extend_length and \
@@ -150,7 +157,7 @@ def Bi_RRT_star_plan(start_xy, goal_xy,
                     # 合并两条路径
                     path = path1 + path2
                     # return path
-                    return prune_path(path, obs_list)
+                    return prune_path_degree(path, obs_list)
         return None
 
 

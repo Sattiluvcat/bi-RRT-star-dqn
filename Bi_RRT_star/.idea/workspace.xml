@@ -4,13 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b809a385-8e20-41df-b484-3d2583d0f90c" name="更改" comment="vf-RRT生成与剪枝，新点选取未优化">
+    <list default="true" id="b809a385-8e20-41df-b484-3d2583d0f90c" name="更改" comment="">
+      <change afterPath="$PROJECT_DIR$/../doubanScore/score.py" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/../pythonProject/try.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/multi_planning/rrt_dwa.py" beforeDir="false" afterPath="$PROJECT_DIR$/multi_planning/rrt_dwa.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/multi_planning/vfrrt_dwa.py" beforeDir="false" afterPath="$PROJECT_DIR$/multi_planning/vfrrt_dwa.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/result_show/vfrrt_dwa_main.py" beforeDir="false" afterPath="$PROJECT_DIR$/result_show/vfrrt_dwa_main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/single_planning/DWA.py" beforeDir="false" afterPath="$PROJECT_DIR$/single_planning/DWA.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/result_show/rrt_main.py" beforeDir="false" afterPath="$PROJECT_DIR$/result_show/rrt_main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/single_planning/Bi_RRT.py" beforeDir="false" afterPath="$PROJECT_DIR$/single_planning/Bi_RRT.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/single_planning/Bi_RRT_star.py" beforeDir="false" afterPath="$PROJECT_DIR$/single_planning/Bi_RRT_star.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/single_planning/VF_Bi_RRT_star.py" beforeDir="false" afterPath="$PROJECT_DIR$/single_planning/VF_Bi_RRT_star.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -37,32 +37,34 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Python.Bi_RRT_star_main.executor": "Run",
-    "Python.RRT.executor": "Run",
-    "Python.VF_Bi_RRT_star.executor": "Run",
-    "Python.dwa_test.executor": "Run",
-    "Python.hello.executor": "Run",
-    "Python.main.executor": "Run",
-    "Python.rrt_dwa.executor": "Run",
-    "Python.rrt_dwa_main.executor": "Run",
-    "Python.rrt_main.executor": "Run",
-    "Python.vfrrt-dwa.executor": "Run",
-    "Python.vfrrt_dwa.executor": "ConcurrencyExecutor",
-    "Python.vfrrt_dwa_main.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "master",
-    "last_opened_file_path": "C:/Users/lingl/Desktop/RRT&PID/Bi_RRT_star/result_show/vfrrt_dwa_main.py",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.pluginManager",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Python.Bi_RRT_star_main.executor&quot;: &quot;Run&quot;,
+    &quot;Python.RRT.executor&quot;: &quot;Run&quot;,
+    &quot;Python.VF_Bi_RRT_star.executor&quot;: &quot;Run&quot;,
+    &quot;Python.bi-rrt-pruned.executor&quot;: &quot;Run&quot;,
+    &quot;Python.bi-rrt.executor&quot;: &quot;Run&quot;,
+    &quot;Python.dwa_test.executor&quot;: &quot;Run&quot;,
+    &quot;Python.hello.executor&quot;: &quot;Run&quot;,
+    &quot;Python.main.executor&quot;: &quot;Run&quot;,
+    &quot;Python.rrt_dwa.executor&quot;: &quot;Run&quot;,
+    &quot;Python.rrt_dwa_main.executor&quot;: &quot;Run&quot;,
+    &quot;Python.rrt_main.executor&quot;: &quot;Run&quot;,
+    &quot;Python.vfrrt-dwa.executor&quot;: &quot;Run&quot;,
+    &quot;Python.vfrrt_dwa.executor&quot;: &quot;ConcurrencyExecutor&quot;,
+    &quot;Python.vfrrt_dwa_main.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/lingl/Desktop/RRT&amp;PID/Bi_RRT_star&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\lingl\Desktop\RRT&amp;PID\Bi_RRT_star\result_show" />
@@ -76,7 +78,31 @@
       <recent name="C:\Users\lingl\Desktop\RRT&amp;PID\Bi_RRT_star\utils" />
     </key>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Python.bi-rrt-pruned">
+    <configuration name="bi-rrt-pruned" type="PythonConfigurationType" factoryName="Python">
+      <module name="Bi_RRT_star" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="SDK_NAME" value="Python 3.9" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/result_show/rrt_main.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="vfrrt-dwa" type="PythonConfigurationType" factoryName="Python">
       <module name="Bi_RRT_star" />
       <option name="ENV_FILES" value="" />
@@ -101,6 +127,10 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <list>
+      <item itemvalue="Python.vfrrt-dwa" />
+      <item itemvalue="Python.bi-rrt-pruned" />
+    </list>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
@@ -142,7 +172,15 @@
       <workItem from="1736135779938" duration="1603000" />
       <workItem from="1736489819800" duration="607000" />
       <workItem from="1736520004926" duration="1201000" />
-      <workItem from="1737943208164" duration="45447000" />
+      <workItem from="1737943208164" duration="45730000" />
+      <workItem from="1738131323712" duration="40000" />
+      <workItem from="1740754365610" duration="627000" />
+      <workItem from="1741071790528" duration="600000" />
+      <workItem from="1741173014031" duration="683000" />
+      <workItem from="1741241207391" duration="12151000" />
+      <workItem from="1741257649180" duration="119000" />
+      <workItem from="1741354918336" duration="292000" />
+      <workItem from="1741499364149" duration="429000" />
     </task>
     <task id="LOCAL-00001" summary="剪枝&amp;避障正常（矩形&amp;圆形）&#10;star效果一般（感觉不如剪枝 不知道为什么">
       <option name="closed" value="true" />
@@ -200,7 +238,15 @@
       <option name="project" value="LOCAL" />
       <updated>1737992910205</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="vf-RRT-DWA结束，新点选取未按vfrrt实现">
+      <option name="closed" value="true" />
+      <created>1738052571829</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1738052571829</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -236,22 +282,25 @@
     <MESSAGE value="vfrrt&amp;dwa初试，暂时效果不明显" />
     <MESSAGE value="vf效果调试，终点树向量场方向相反" />
     <MESSAGE value="vf-RRT生成与剪枝，新点选取未优化" />
-    <option name="LAST_COMMIT_MESSAGE" value="vf-RRT生成与剪枝，新点选取未优化" />
+    <MESSAGE value="vf-RRT-DWA结束，新点选取未按vfrrt实现" />
+    <option name="LAST_COMMIT_MESSAGE" value="vf-RRT-DWA结束，新点选取未按vfrrt实现" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Bi_RRT_star_main_py$RRT.coverage" NAME="RRT 覆盖结果" MODIFIED="1732766406528" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/DWA_py$vfrrt_dwa_main.coverage" NAME="vfrrt_dwa_main 覆盖结果" MODIFIED="1735975607798" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/result_show" />
-    <SUITE FILE_PATH="coverage/DWA_py$rrt_main.coverage" NAME="rrt_main 覆盖结果" MODIFIED="1734169291391" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/result_show" />
+    <SUITE FILE_PATH="coverage/DWA_py$rrt_main.coverage" NAME="rrt_main 覆盖结果" MODIFIED="1741173547229" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/result_show" />
     <SUITE FILE_PATH="coverage/Bi_RRT_star_main_py$dwa_test.coverage" NAME="dwa_test 覆盖结果" MODIFIED="1732767316374" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/DWA_py$main.coverage" NAME="main 覆盖结果" MODIFIED="1732782396759" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/result_show" />
     <SUITE FILE_PATH="coverage/DWA_py$vfrrt_dwa.coverage" NAME="vfrrt-dwa 覆盖结果" MODIFIED="1738052086169" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/Bi_RRT_star_main_py$hello.coverage" NAME="hello 覆盖结果" MODIFIED="1731310219666" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/DWA_py$rrt_dwa_main.coverage" NAME="rrt_dwa_main 覆盖结果" MODIFIED="1735818177191" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/result_show" />
     <SUITE FILE_PATH="coverage/DWA_py$dwa_test.coverage" NAME="dwa_test 覆盖结果" MODIFIED="1734163820319" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/DWA_py$bi_rrt.coverage" NAME="bi-rrt 覆盖结果" MODIFIED="1741173684742" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/DWA_py$rrt_dwa.coverage" NAME="rrt_dwa 覆盖结果" MODIFIED="1735815127829" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/multi_planning" />
     <SUITE FILE_PATH="coverage/DWA_py$VF_Bi_RRT_star.coverage" NAME="VF_Bi_RRT_star 覆盖结果" MODIFIED="1735967664727" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/single_planning" />
     <SUITE FILE_PATH="coverage/RRT_py$Bi_RRT_star_main.coverage" NAME="Bi_RRT_star_main 覆盖结果" MODIFIED="1731034386494" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Bi_RRT_star_main_py$Bi_RRT_star_main.coverage" NAME="Bi_RRT_star_main 覆盖结果" MODIFIED="1732765342774" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/RRT_py$RRT.coverage" NAME="RRT 覆盖结果" MODIFIED="1731034518018" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/DWA_py$bi_rrt_pruned.coverage" NAME="bi-rrt-pruned 覆盖结果" MODIFIED="1741355059455" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
   </component>
 </project>

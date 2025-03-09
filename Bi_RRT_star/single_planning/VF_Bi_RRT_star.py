@@ -189,7 +189,7 @@ def VF_Bi_RRT_star_plan(start_xy, goal_xy, obslis_xy, vector_field):
     start_point = start_xy
     goal_point = goal_xy
     obs_list = obslis_xy
-    extend_length = 5
+    extend_length = 5       # TODO：要走迷宫的话改为10，rewrite里的半径改为15
     max_iter = 10000
     mini_degree = 90  # 最大转角，180°-mini_degree，反着定义
     # 路径总数
@@ -236,6 +236,8 @@ def VF_Bi_RRT_star_plan(start_xy, goal_xy, obslis_xy, vector_field):
                 degree2 = calc_triangle_deg(node_list2[near_index2], rnd_nd2, node_list2[near_index2 - 1])
                 if degree1 < mini_degree and degree1 != 0 and degree2 < mini_degree and degree2 != 0:
                     continue
+            else:
+                continue
 
             if new_nd1 and not check_collision(new_nd1, node_list1[near_index1], obs_list):
                 # print("right_new_nd1:", new_nd1.x, new_nd1.y)
@@ -246,6 +248,8 @@ def VF_Bi_RRT_star_plan(start_xy, goal_xy, obslis_xy, vector_field):
                 rewire(new_nd1, node_list1, obs_list)
                 plt.plot(new_nd1.x, new_nd1.y, "xg")
                 plt.plot([new_nd1.parent.x, new_nd1.x], [new_nd1.parent.y, new_nd1.y], 'g')
+            else:
+                continue
             if new_nd2 and not check_collision(new_nd2, node_list2[near_index2], obs_list):
                 # print("right_new_nd2:", new_nd2.x, new_nd2.y)
                 parent_index = rewrite_index(new_nd2, node_list2, obs_list)
@@ -255,6 +259,8 @@ def VF_Bi_RRT_star_plan(start_xy, goal_xy, obslis_xy, vector_field):
                 rewire(new_nd2, node_list2, obs_list)
                 plt.plot(new_nd2.x, new_nd2.y, "xb")
                 plt.plot([new_nd2.parent.x, new_nd2.x], [new_nd2.parent.y, new_nd2.y], 'b')
+            else:
+                continue
 
             plt.axis("equal")
             plt.axis([0.0, 260.0, -200.0, 10.0])
