@@ -112,7 +112,7 @@ def calc_triangle_deg(pointA, pointB, pointC):
 
 # 在规定区域内生成随机点
 def get_random_node(x_min, x_max, y_min, y_max, goal_point=None):
-    if goal_point is not None and random.random() <= 0.2:
+    if goal_point is not None and random.random() < 0:
         x = goal_point[0]
         y = goal_point[1]
     else:
@@ -169,7 +169,7 @@ def prune_path(path, obs_list):
     i = 0
     while i < len(path) - 1:
         found = False
-        for j in range(len(path) - 1, i, -1):
+        for j in range(len(path) - 1, i+2, -1):
             if not check_collision(path[i], path[j], obs_list):
                 pruned_path.append(path[j])
                 i = j
@@ -177,9 +177,17 @@ def prune_path(path, obs_list):
                 break
         if not found:
             # 确保路径前进
+            if i+1<len(path):
+                pruned_path.append(path[i+1])
             i += 1
     if pruned_path[-1] != path[-1]:
         pruned_path.append(path[-1])
+    # end_time=time.time()
+    # 检查是否会碰，会碰则返回 None
+    for i in range(len(pruned_path) - 1):
+        if check_collision(pruned_path[i], pruned_path[i + 1], obs_list):
+            print("Error: Pruned path is not collision-free")
+            return None
     return pruned_path
 
 
@@ -191,24 +199,51 @@ def prune_path_degree(path, obs_list):
 
     while i < len(path) - 1:
         found = False
-        for j in range(len(path) - 1, i, -1):
+        for j in range(len(path) - 1, i+2, -1):
             # 转角约束
-            if i > 0:
+            if len(pruned_path) > 1:
                 # 这里转角之前定义错了
-                degree = calc_triangle_deg(path[i], path[i - 1], path[j])
+                degree = calc_triangle_deg(path[i], pruned_path[-2], path[j])
+                # print(path[i],pruned_path[-2],path[j],degree,i,len(pruned_path))
                 if degree < mini_degree and degree != 0:
                     continue
             # 碰撞约束
             if not check_collision(path[i], path[j], obs_list):
+                # if i>0:
+                # print(calc_triangle_deg(path[i], path[i - 1], path[j]),path[i], path[i - 1], path[j])
+                # 保证至少有一个点满足转角约束
+                if j+1<len(path):
+                    degree_bot=calc_triangle_deg(path[j], path[i], path[j+1])
+                    if degree_bot<mini_degree and degree_bot!=0:
+                        continue
                 pruned_path.append(path[j])
                 i = j
                 found = True
                 break
         if not found:
+            if i + 1 < len(path):
+                pruned_path.append(path[i + 1])
             i += 1
     if pruned_path[-1] != path[-1]:
         pruned_path.append(path[-1])
-    return pruned_path
+    end_time=time.time()
+    # 检查是否会碰，会碰则返回 None
+    for i in range(len(pruned_path) - 1):
+        if check_collision(pruned_path[i], pruned_path[i + 1], obs_list):
+            print("Error: Pruned path is not collision-free")
+            # print(pruned_path)
+            # print(pruned_path[i], pruned_path[i + 1], "i=", i)
+            return None,None
+        if 0 < i < len(pruned_path) - 1:
+            if (calc_triangle_deg(pruned_path[i], pruned_path[i + 1], pruned_path[i - 1]) < mini_degree and
+                    calc_triangle_deg(pruned_path[i], pruned_path[i + 1], pruned_path[i - 1]) != 0):
+                print("Error: Pruned path is not degree-free")
+                # print(pruned_path[i], pruned_path[i + 1], pruned_path[i - 1], "i=", i, "角度：",
+                #       calc_triangle_deg(pruned_path[i], pruned_path[i + 1], pruned_path[i - 1]))
+                # print(pruned_path)
+                # print("output is done")
+                return None,None
+    return pruned_path,end_time
 
 
 def RRT_plan(start_xy, goal_xy,
