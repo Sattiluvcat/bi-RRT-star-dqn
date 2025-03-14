@@ -60,22 +60,29 @@ def get_vector_field(x, y, vector_field):
 def upstream_criterion(path, vector_field):
     total_difference = 0
     for i in range(1, len(path)):
-        # 当前位置的向量场
-        u, v = get_vector_field(path[i][0], path[i][1], vector_field)
-        vector_field_magnitude = np.sqrt(u ** 2 + v ** 2)
-        # 本来已经归一化了 但是计算精度可能不准确 此处二加工
-        direction_vector_field = np.array([u, v]) / vector_field_magnitude
+        start_point = path[i - 1]
+        end_point = path[i]
+        distance = np.linalg.norm(np.array(end_point) - np.array(start_point))
+        num_points = int(distance / 1.4) + 1  # 每1.4米插入一个点==>向量场为 1m×1m，对角线即1.4米
+        x_values = np.linspace(start_point[0], end_point[0], num_points)
+        y_values = np.linspace(start_point[1], end_point[1], num_points)
+        for x, y in zip(x_values, y_values):
+            # 当前位置的向量场
+            u, v = get_vector_field(path[i][0], path[i][1], vector_field)
+            vector_field_magnitude = np.sqrt(u ** 2 + v ** 2)
+            # 本来已经归一化了 但是计算精度可能不准确 此处二加工
+            direction_vector_field = np.array([u, v]) / vector_field_magnitude
 
-        # 当前速度方向——路径求导
-        direction_path = np.gradient(np.array(path), axis=0)[i]
-        path_magnitude = np.linalg.norm(direction_path)
-        # 归一化速度方向 --> 需要，因为向量场本身已经归一化 --> 应用不等式时两者模长相等，均为1
-        direction_path /= path_magnitude
+            # 当前速度方向——路径求导
+            direction_path = np.gradient(np.array(path), axis=0)[i]
+            path_magnitude = np.linalg.norm(direction_path)
+            # 归一化速度方向 --> 需要，因为向量场本身已经归一化 --> 应用不等式时两者模长相等，均为1
+            direction_path /= path_magnitude
 
-        # Cauchy-Schwarz 不等式: |a · b| <= ||a|| * ||b||
-        dot_product = np.dot(direction_path, direction_vector_field)
-        # 👆归一化后直接取 1 即可
-        total_difference += 1 * vector_field_magnitude - dot_product
+            # Cauchy-Schwarz 不等式: |a · b| <= ||a|| * ||b||
+            dot_product = np.dot(direction_path, direction_vector_field)
+            # 👆归一化后直接取 1 即可
+            total_difference += 1 * vector_field_magnitude - dot_product
     return total_difference
 
 
@@ -104,11 +111,16 @@ def vf_prune_path(path, obs_list, vector_field):
             # 转角约束
             if i > 0:
                 # 这里转角之前定义错了
-                degree = calc_triangle_deg(path[i], path[i - 1], path[j])
+                degree = calc_triangle_deg(path[i], pruned_path[-2], path[j])
                 if degree < mini_degree and degree != 0:
                     continue
             # 碰撞约束
             if not check_collision(path[i], path[j], obs_list):
+                # 保证至少有一个点满足转角约束
+                if j + 1 < len(path):
+                    degree_bot = calc_triangle_deg(path[j], path[i], path[j + 1])
+                    if degree_bot < mini_degree and degree_bot != 0:
+                        continue
                 # 现有优化路径 + 现在考虑的路径不剪枝形式
                 candidate_path = pruned_path + path[i + 1:]
                 # 计算路径评分——跳过 i 到 j 中间的路径
@@ -124,6 +136,8 @@ def vf_prune_path(path, obs_list, vector_field):
                     found = True
                     break
         if not found:
+            if i + 1 < len(path):
+                pruned_path.append(path[i + 1])
             i += 1
     if pruned_path[-1] != path[-1]:
         pruned_path.append(path[-1])
@@ -173,9 +187,9 @@ def path_score(path, vector_field):
         # total_length /= 350
         # total_difference /= 150
         # total_angle /= 20
-        prize_length = 0.2
-        prize_difference = 1
-        prize_angle = 0.2
+    prize_length = 0.2
+    prize_difference = 1
+    prize_angle = 0.2
 
     # print("total_length:", total_length, " total_difference:", total_difference, " total_angle:", total_angle)
     return total_difference * prize_difference + total_angle * prize_angle + total_length * prize_length
@@ -231,9 +245,9 @@ def VF_Bi_RRT_star_plan(start_xy, goal_xy, obslis_xy, vector_field):
                 continue
 
             # 转角约束
-            if node_list1[near_index1 - 1] is not None and node_list2[near_index2 - 1] is not None:
-                degree1 = calc_triangle_deg(node_list1[near_index1], rnd_nd1, node_list1[near_index1 - 1])
-                degree2 = calc_triangle_deg(node_list2[near_index2], rnd_nd2, node_list2[near_index2 - 1])
+            if node_list1[near_index1].parent is not None and node_list2[near_index2].parent is not None:
+                degree1 = calc_triangle_deg(node_list1[near_index1], rnd_nd1, node_list1[near_index1].parent)
+                degree2 = calc_triangle_deg(node_list2[near_index2], rnd_nd2, node_list2[near_index2].parent)
                 if degree1 < mini_degree and degree1 != 0 or degree2 < mini_degree and degree2 != 0:
                     continue
             # else:
