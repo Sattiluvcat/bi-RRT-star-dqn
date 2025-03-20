@@ -43,8 +43,8 @@ def run_bi_rrt_multiple_times(start, goal, obstacle_list, num_runs=100):
             num_runs=num_runs+1
 
     df = pd.DataFrame(results, columns=['Run Time (s)', 'Path Length (m)', 'Total Angle (°)', 'Max Angle (°)','Sum'])
-    df.to_excel('bi_rrt_star_prune_results_sum_pu.xlsx', index=False)
-    print("Results saved to bi_rrt_star_prune_results_sum_pu.xlsx")
+    df.to_excel('rrt_star_results_sum_pu.xlsx', index=False)
+    print("Results saved to rrt_star_results_sum_pu.xlsx")
 
     # Plot all paths
     plt.figure()

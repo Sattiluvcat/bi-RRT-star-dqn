@@ -1,5 +1,6 @@
 import os
 import shutil
+import time
 
 import numpy as np
 from matplotlib import pyplot as plt, animation
@@ -12,14 +13,19 @@ from utils.node import Node
 os.makedirs('plots', exist_ok=True)
 
 
-def update_obstacles(obstacles):
+def update_obstacles(obstacles, set_environ=False):
     for obs in obstacles:
-        # 向左下移动
-        obs[0] -= np.random.uniform(0, 0.5)  # Randomly move the obstacle in x direction
-        obs[1] -= np.random.uniform(0, 0.5)  # Randomly move the obstacle in y direction
+        # set为大障碍物环境
+        if set_environ and len(obs)==4:
+            obs[0] += 1
+            obs[2] += 1
+        # 不 set 为 L 型障碍环境
+        elif not set_environ and len(obs)==3:
+            obs[0]+=np.random.uniform(0,0.1)
+            obs[1]+=np.random.uniform(0,0.1)
 
 
-def rrt_dwa(start, goal_last, obstacles):
+def rrt_dwa(start, goal_last, obstacles, set_environ=False):
     config = {
         'max_speed': 2.0,  # Reduce maximum speed
         'min_speed': -2.0,  # Reduce minimum speed
@@ -46,7 +52,7 @@ def rrt_dwa(start, goal_last, obstacles):
     dwa = DWA(config)
     x = np.array([start[0], start[1], 0.0, 0.0, 0.0])
     path = [x[:2].copy()]
-    rrt_path = Bi_RRT_star_plan(start, goal_last, obstacles)
+    rrt_path,end_time = Bi_RRT_star_plan(start, goal_last, obstacles)
     print("rrtpath:", rrt_path)
 
     plt.plot([x for (x, y) in rrt_path], [y for (x, y) in rrt_path], 'r')
@@ -65,23 +71,22 @@ def rrt_dwa(start, goal_last, obstacles):
     goal = np.array(rrt_path[rrt_index])
 
     plt.plot(x[0], x[1], "ob")
-    plt.axis([0, 260, -200, 10])
+    plt.axis([0, 120, -105, 15])
     i = 0
+    sum_time = 0.0
     while rrt_index <= len(rrt_path):
         if rrt_index == len(rrt_path):
             goal = np.array(rrt_path[-1])
         else:
             goal = np.array(rrt_path[rrt_index])
-        print("goal:",goal[0], goal[1])
         # 与下方找到最近路径点函数保持对应关系（不能比函数的参数大）
-        while np.linalg.norm(x[:2] - goal) >= 8:
-            update_obstacles(obstacles)  # Update the positions of the dynamic obstacles
+        while np.linalg.norm(x[:2] - goal) >= 3:
+            update_obstacles(obstacles, set_environ)  # Update the positions of the dynamic obstacles
             for obs in obstacles:
                 if len(obs) == 3:
                     plot_obs(obs[0], obs[1], obs[2])
                 elif len(obs) == 4:
                     plot_obs_rec(obs[0], obs[1], obs[2], obs[3])
-            print("now")
 
             # Check for collision along the line to the goal
             if not check_collision(Node(x[0], x[1]),
@@ -89,22 +94,36 @@ def rrt_dwa(start, goal_last, obstacles):
                                         x[1] + 25 * np.sin(np.arctan2(goal[1] - x[1], goal[0] - x[0]))), obstacles):
                 # No collision, move directly towards the goal
                 direction = np.arctan2(goal[1] - x[1], goal[0] - x[0])
-                x[0] += config['max_speed'] * np.cos(direction)
-                x[1] += config['max_speed'] * np.sin(direction)
+                speed=config['max_speed']
+                steering_angle = direction - x[2]
+                x = dwa.motion(x, [speed, steering_angle])
             else:
                 # Collision detected, use DWA
                 print("I'm in!")
+                start_time=time.time()
                 u, _ = dwa.plan(x, goal, obstacles)
                 x = dwa.motion(x, u)
+
+                end_time=time.time()
+                if u == [0.0, 0.0]:
+                    sum_time+=end_time-start_time
+                    if sum_time >= 2:
+                        print("停滞时间过长，生成RRT路径中···")
+                        # 已经停滞，相当于起点，不用考虑转弯角度什么的
+                        tmp_rrt_path = Bi_RRT_star_plan(x[:2], goal, obstacles)
+                        if tmp_rrt_path is not None:
+                            rrt_path=tmp_rrt_path+rrt_path[rrt_index+1:]
+                            rrt_index = 0
+                    sum_time = 0.0
+                    break
 
             path.append(x[:2].copy())
 
             # Plot the path
             plt.plot([x for (x, y) in rrt_path], [y for (x, y) in rrt_path], 'y')
-            print("path:", path)
             for p in path:
                 plt.plot(p[0], p[1], ".g")
-            plt.axis([0, 260, -200, 10])
+            plt.axis([0, 120, -105, 15])
 
             plt.plot(np.array(rrt_path[-1])[0], np.array(rrt_path[-1])[1], "xk")
             plt.plot(goal[0], goal[1], "xr")
@@ -136,7 +155,7 @@ def rrt_dwa(start, goal_last, obstacles):
             rrt_index = len(rrt_path)
         else:
             rrt_index = find_nearest_point_index(x, rrt_path, last_goal_index)
-        print("rrtindex:", rrt_index)
+        # print("rrtindex:", rrt_index)
 
     # 最后十米没有障碍物直接到达
     if not obstacles_in_front(path[-1], rrt_path[-1], obstacles) and np.linalg.norm(path[-1] - rrt_path[-1]) < 10:
@@ -144,9 +163,7 @@ def rrt_dwa(start, goal_last, obstacles):
 
     for p in path:
         plt.plot(p[0], p[1], ".g")
-    # Plot the RRT path
-    # ax.plot([x for (x, y) in rrt_path], [y for (x, y) in rrt_path], 'r')
-    plt.axis([0, 260, -200, 10])
+    plt.axis([0, 120, -105, 15])
     plt.plot(np.array(rrt_path[-1])[0], np.array(rrt_path[-1])[1], "xk")
     plt.plot([x for (x, y) in rrt_path], [y for (x, y) in rrt_path], 'y')
     plt.plot(goal[0], goal[1], "xr")
@@ -182,8 +199,8 @@ def obstacles_in_front(x, goal, obstacles):
 
 def find_nearest_point_index(x, path, start_index):
     min_dist = float('inf')
-    # 相距大于10m的点才考虑 若与当前目标点相距小于10m则自动从下一目标点开始检索
-    max_dist=10
+    # 相距大于5m的点才考虑 若与当前目标点相距小于5m则自动从下一目标点开始检索
+    max_dist=5
     nearest_index = start_index
     for i in range(start_index, len(path)):
         dist = np.linalg.norm(x[:2] - path[i])

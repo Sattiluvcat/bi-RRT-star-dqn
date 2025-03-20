@@ -1,24 +1,80 @@
 import time
 
+import pandas as pd
+
 from multi_planning.rrt_dwa import rrt_dwa
+from single_planning.Bi_RRT import calc_path_length
+
+
+def run_rrt_dwa_times(start_point, goal_point, obs_list, run_times=100,environ=False):
+    # 纯DWA算法时，设置跳出时间
+    results = []
+
+    for i in range(run_times):
+        print(f"Run {i + 1}")
+        start_time_cal = time.time()
+        path, dwa, x, goal_point, obstacles, config, rrt_path = rrt_dwa(start_point, goal_point, obs_list,environ)
+        end_time = time.time()
+
+        if path is not None:
+            run_time = end_time - start_time_cal
+            path_length = calc_path_length(path)
+            stagnation_count = sum(1 for p in path if p == [0.0, 0.0])
+            results.append([run_time, path_length, stagnation_count])
+        else:
+            results.append([None, None, None])
+
+    df = pd.DataFrame(results, columns=['Run Time (s)', 'Path Length (m)', 'Stagnation Count'])
+    df.to_excel('rrt_dwa_results.xlsx', index=False)
+    print("Results saved to rrt_dwa_results.xlsx")
+
+
+
 
 if __name__ == "__main__":
     start_time = time.time()
-    start = [8.77650817669928, 4.951398874633014]
-    goal = [249.09851929917932, -195.2040752498433]
-    obstacle_list = [[33.77685192972422, -52.90446031652391, 7.5], [46.19124796241522, -77.85628066305071, 9.0],
-                     [80.34613360464573, -43.54909089393914, 7.5], [111.38825733587146, -74.74188929889351, 7.5],
-                     [80.16235236078501, 9.456780110485852, 4.5], [139.31754435040057, -12.368450773879886, 4.5],
-                     [207.6151233687997, 3.4003808852285147, 15.0], [111.59657261520624, -127.13194767106324, 15.0],
-                     [307.5552379246801, -6.496737029403448, 15.0], [182.18576977215707, -97.71181975770742, 15.0],
-                     [232.431648472324, -58.93625687714666, 220, -70], [76.79213218018413, -161.22955951932818, 7.5],
-                     [168.2150300759822, -149.5354239968583, 7.5], [265.8879858329892, -127.0088061131537, 7.5],
-                     [325.93784911744297, -71.36904122401029, 7.5], [284.0254806391895, -45.27248460613191, 4.5],
-                     [115.431648472324, -86.93625687714666, 10]]
+    start = [0,5]
+    goal = [120,-95]
+    obstacle_list = [
+        # 移动大障碍
+        [25,-10,10],
+        [90,-60,12],
+        [50,-70,18],
+        [65,-20,15],
+        [90,-45,150,-20],
+        # L型障碍
+        # [78,-55,79,-25],
+        # [45,-55,78,-56],
+        # # [25, -20, 12],
+        # [110, -50, 14],
+        # [30, -75, 16],
+        # [65, -5, 10]
+    ]
 
-    path, dwa, x, goal, obstacles, config, rrt_path = rrt_dwa(start, goal, obstacle_list)
+    # set为True表示大障碍物环境，False表示L型障碍
+    run_rrt_dwa_times(start,goal,obstacle_list,100,True)
 
-    if path is not None:
-        print("Path found and animation saved.")
-    else:
-        print("No path found")
+    # plt.plot(start[0], start[1], "xr", label="start")
+    # plt.plot(goal[0], goal[1], "xg", label="goal")
+    # plt.axis("equal")
+    # plt.axis([0, 120, -105, 15])
+    # ss=0
+    # s0s=0
+    # for obs in obstacle_list:
+    #     if len(obs) == 3:
+    #         plot_obs(obs[0], obs[1], obs[2],"y",ss)
+    #         ss+=1
+    #     elif len(obs) == 4:
+    #         plot_obs_rec(obs[0], obs[1], obs[2], obs[3],"b",s0s)
+    #         s0s+=1
+    # plt.xlabel("x/m")
+    # plt.ylabel("y/m")
+    # plt.legend()
+    # plt.show()
+
+    # path, dwa, x, goal, obstacles, config, rrt_path = rrt_dwa(start, goal, obstacle_list, True)
+
+    # if path is not None:
+    #     print("Path found and animation saved.")
+    # else:
+    #     print("No path found")
