@@ -5,7 +5,7 @@ from utils.node import Node
 
 
 def rewrite_index(node_new, node_list, obstacle_list):
-    r = 15  # Define search radius,要跟步长匹配
+    r = 8  # Define search radius,要跟步长匹配
     min_cost = float('inf')
     min_node_index = None
     # grand_node=
@@ -36,7 +36,7 @@ def rewrite_index(node_new, node_list, obstacle_list):
 #                 # break                 #若取消注释，则只有第一个满足该条件的节点的parent会变为node_new
 
 def rewire(node_new, node_list, obstacle_list):
-    r = 30  # Define search radius
+    r = 15  # Define search radius
 
     for node in node_list:
         if (node != node_new.parent and calc_p2p_dis(node_new, node) < r
@@ -61,21 +61,35 @@ def Bi_RRT_star_plan(start_xy, goal_xy,
     print("起始点：")
     print(start_xy)
     print(goal_xy)
-    x_min = 0
-    x_max = 260
-    y_min = -200
-    y_max = 10
+    x_min = -10
+    x_max = 130
+    y_min = -105
+    y_max = 15
     print(x_min, x_max, y_min, y_max)
     start_point = start_xy
     goal_point = goal_xy
     obs_list = obslis_xy
-    extend_length = 10
+    extend_length = 5
     mini_degree = 90
     max_iter = 50000
     start_node = Node(start_point[0], start_point[1])
     goal_node = Node(goal_point[0], goal_point[1])
     node_list1 = [start_node]  # 从起点开始的树
     node_list2 = [goal_node]  # 从终点开始的树
+
+    print("障碍物：", obs_list)
+    # plt.plot(start_point[0], start_point[1], "xr", label="start")
+    plt.plot([start_point[0], goal_point[0]], [start_point[1], goal_point[1]], "xk")
+    for obs in obs_list:
+        if len(obs) == 3:
+            plot_obs(obs[0], obs[1], obs[2])
+        elif len(obs) == 4:
+            plot_obs_rec(obs[0], obs[1], obs[2], obs[3])
+    # plt.xlabel("X/m")
+    # plt.ylabel("Y/m")
+    # plt.legend(["path", "path_pruned", "start,goal", "obstacles"])
+    plt.show()
+
     path = None
     if not check_collision(start_node, goal_node, obs_list):
         path = [start_point, goal_point]
@@ -120,12 +134,12 @@ def Bi_RRT_star_plan(start_xy, goal_xy,
                 new_nd2.cost = new_nd2.parent.cost + calc_p2p_dis(new_nd2, new_nd2.parent)
                 rewire(new_nd2, node_list2, obs_list)
 
-                # plt.plot(new_nd2.x, new_nd2.y, "xb")
-                # plt.plot([new_nd2.parent.x, new_nd2.x], [new_nd2.parent.y, new_nd2.y], 'b')
+                plt.plot(new_nd2.x, new_nd2.y, "xb")
+                plt.plot([new_nd2.parent.x, new_nd2.x], [new_nd2.parent.y, new_nd2.y], 'b')
             else:
                 continue
             plt.axis("equal")
-            plt.axis([0.0, 260.0, -200.0, 10.0])
+            plt.axis([0.0, 120.0, -105.0, 15.0])
             # if calc_p2p_dis(new_nd1,goal_node)<extend_length and check_collision(new_nd1,goal_node,obs_list)==False:
             #     node_list1.append(goal_node)
             #     goal_node.parent=new_nd1
@@ -188,6 +202,7 @@ def Bi_RRT_star_plan(start_xy, goal_xy,
                     #             print(path[j], path[j + 1], path[j - 1], "j=", j,"path1_len: ",len(path1))
                     #             print(path)
                     #             print("output is done")
+                    plt.show()
                     return prune_path_degree(path, obs_list)
                     # return path, time.time()
             for node2 in node_list2:
@@ -225,6 +240,7 @@ def Bi_RRT_star_plan(start_xy, goal_xy,
                     #             print(path[j], path[j + 1], path[j - 1], "j=", j)
                     #             print(path)
                     #             print("output is done")
+                    plt.show()
                     return prune_path_degree(path, obs_list)
                     # return path, time.time()
         return None, None

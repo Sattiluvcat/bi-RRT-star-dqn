@@ -53,6 +53,21 @@ def calc_p2l_dis(line_point1, line_point2, point):  # 到两点确定的直线�
     return dis
 
 
+# 检查点是否在障碍物内
+def check_point_in_obs(point, obs_list):
+    if isinstance(point, Node):
+        point = [point.x, point.y]
+    for obs in obs_list:
+        if len(obs) == 3:  # 圆形障碍物
+            ox, oy, size = obs
+            if calc_p2p_dis(point, Node(ox, oy)) <= size:
+                return True
+        elif len(obs) == 4:  # 矩形障碍物
+            if obs[0] <= point[0] <= obs[2] and obs[1] <= point[1] <= obs[3]:
+                return True
+    return False
+
+
 #定义到线段的距离
 def calc_p2l_xianduan_dis(line_point1, line_point2, point):
     if isinstance(line_point1, Node):
@@ -170,7 +185,7 @@ def prune_path(path, obs_list):
     i = 0
     while i < len(path) - 1:
         found = False
-        for j in range(len(path) - 1, i+2, -1):
+        for j in range(len(path) - 1, i + 2, -1):
             if not check_collision(path[i], path[j], obs_list):
                 pruned_path.append(path[j])
                 i = j
@@ -178,8 +193,8 @@ def prune_path(path, obs_list):
                 break
         if not found:
             # 确保路径前进
-            if i+1<len(path):
-                pruned_path.append(path[i+1])
+            if i + 1 < len(path):
+                pruned_path.append(path[i + 1])
             i += 1
     if pruned_path[-1] != path[-1]:
         pruned_path.append(path[-1])
@@ -200,7 +215,7 @@ def prune_path_degree(path, obs_list):
 
     while i < len(path) - 1:
         found = False
-        for j in range(len(path) - 1, i+2, -1):
+        for j in range(len(path) - 1, i + 2, -1):
             # 转角约束
             if len(pruned_path) > 1:
                 # 这里转角之前定义错了
@@ -213,9 +228,9 @@ def prune_path_degree(path, obs_list):
                 # if i>0:
                 # print(calc_triangle_deg(path[i], path[i - 1], path[j]),path[i], path[i - 1], path[j])
                 # 保证至少有一个点满足转角约束
-                if j+1<len(path):
-                    degree_bot=calc_triangle_deg(path[j], path[i], path[j+1])
-                    if degree_bot<mini_degree and degree_bot!=0:
+                if j + 1 < len(path):
+                    degree_bot = calc_triangle_deg(path[j], path[i], path[j + 1])
+                    if degree_bot < mini_degree and degree_bot != 0:
                         continue
                 pruned_path.append(path[j])
                 i = j
@@ -227,14 +242,14 @@ def prune_path_degree(path, obs_list):
             i += 1
     if pruned_path[-1] != path[-1]:
         pruned_path.append(path[-1])
-    end_time=time.time()
+    end_time = time.time()
     # 检查是否会碰，会碰则返回 None
     for i in range(len(pruned_path) - 1):
         if check_collision(pruned_path[i], pruned_path[i + 1], obs_list):
             print("Error: Pruned path is not collision-free")
             # print(pruned_path)
             # print(pruned_path[i], pruned_path[i + 1], "i=", i)
-            return None,None
+            return None, None
         if 0 < i < len(pruned_path) - 1:
             if (calc_triangle_deg(pruned_path[i], pruned_path[i + 1], pruned_path[i - 1]) < mini_degree and
                     calc_triangle_deg(pruned_path[i], pruned_path[i + 1], pruned_path[i - 1]) != 0):
@@ -243,8 +258,8 @@ def prune_path_degree(path, obs_list):
                 #       calc_triangle_deg(pruned_path[i], pruned_path[i + 1], pruned_path[i - 1]))
                 # print(pruned_path)
                 # print("output is done")
-                return None,None
-    return pruned_path,end_time
+                return None, None
+    return pruned_path, end_time
 
 
 def RRT_plan(start_xy, goal_xy,
@@ -409,19 +424,19 @@ def re_obs(obs_list):
 
 
 # 画圆
-def plot_obs(x, y, size, color="-b"):  # pragma: no cover
+def plot_obs(x, y, size, color="-b",s=0):  # pragma: no cover
     deg = list(range(0, 360, 5))
     deg.append(0)
     xl = [x + size * math.cos(math.radians(d)) for d in deg]
     yl = [y + size * math.sin(math.radians(d)) for d in deg]
-    plt.plot(xl, yl, color)
+    plt.plot(xl, yl, color,label="static_obstacles" if s==0 else None)
 
 
 # 画方
-def plot_obs_rec(x1, y1, x2, y2, color="-b"):
+def plot_obs_rec(x1, y1, x2, y2, color="-b",s=0):
     xl = [x1, x2, x2, x1, x1]
     yl = [y1, y1, y2, y2, y1]
-    plt.plot(xl, yl, color)
+    plt.plot(xl, yl, color,label="dynamic_obstacles" if s==0 else None)
 
 
 def path_score(path, all_time, obs_list):

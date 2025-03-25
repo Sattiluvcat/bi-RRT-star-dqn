@@ -1,6 +1,7 @@
 # vfrrt*结合dwa的规划主函数，新增产生向量场函数，rrt路径由VF_Bi_RRT_star_plan函数生成
 import os
 import shutil
+import time
 
 import numpy as np
 from matplotlib import pyplot as plt, animation
@@ -13,6 +14,7 @@ from utils.node import Node
 
 os.makedirs('plots', exist_ok=True)
 
+# 向量大小
 
 def generate_vector_field(x_range, y_range, spacing):
     x = np.arange(x_range[0], x_range[1], spacing)
@@ -32,18 +34,22 @@ def generate_vector_field(x_range, y_range, spacing):
     U = U / magnitude
     V = V / magnitude
 
+    # 引入变化规律
+    U = U * (1 + 0.5 * np.sin(X / 10) * np.cos(Y / 10))
+    V = V * (1 + 0.5 * np.sin(X / 10) * np.cos(Y / 10))
+
     return X, Y, U, V
 
 
 def vf_rrt_dwa(start, goal, obstacles):
     config = {
         'max_speed': 2.0,  # Reduce maximum speed
-        'min_speed': -2.5,  # Reduce minimum speed
-        'max_yawrate': 20.0 * np.pi / 180.0,  # Reduce maximum yaw rate
+        'min_speed': -2.0,  # Reduce minimum speed
+        'max_yawrate': 40.0 * np.pi / 180.0,  # Reduce maximum yaw rate
         'max_accel': 1,  # Reduce maximum acceleration
         'max_dyawrate': 10.0 * np.pi / 180.0,  # Reduce maximum change in yaw rate
-        'v_reso': 0.2,  # 速度的分辨率（同下）
-        'yawrate_reso': 0.2 * np.pi / 180.0,  # 旋转速率的分辨率（步长——每次增加这么多）
+        'v_reso': 0.15,  # 速度的分辨率（同下）
+        'yawrate_reso': 0.15 * np.pi / 180.0,  # 旋转速率的分辨率（步长——每次增加这么多）
         'dt': 1.0,  # Reduce time step
         'predict_time': 5.0,  # Reduce prediction time
         'to_goal_cost_gain': 1.0,
@@ -82,6 +88,7 @@ def vf_rrt_dwa(start, goal, obstacles):
     plt.plot(x[0], x[1], "ob")
     plt.axis([0, 260, -200, 10])
     i = 0
+    sum_time = 0.0
     while rrt_index <= len(vf_rrt_path):
         if rrt_index == len(vf_rrt_path):
             goal = np.array(vf_rrt_path[-1])
@@ -89,29 +96,45 @@ def vf_rrt_dwa(start, goal, obstacles):
             goal = np.array(vf_rrt_path[rrt_index])
         # print("goal:", goal[0], goal[1])
         # 与下方找到最近路径点函数保持对应关系（不能比函数的参数大）
-        while np.linalg.norm(x[:2] - goal) >= 8:
+        while np.linalg.norm(x[:2] - goal) >= 3:
             update_obstacles(obstacles)  # Update the positions of the dynamic obstacles
             for obs in obstacles:
                 if len(obs) == 3:
                     plot_obs(obs[0], obs[1], obs[2])
                 elif len(obs) == 4:
                     plot_obs_rec(obs[0], obs[1], obs[2], obs[3])
-            print("now")
+            # print("now")
 
             # Check for collision along the line to the goal，前方 10m 有障碍物则切换
             if not check_collision(Node(x[0], x[1]),
                                    Node(x[0] + 10 * np.cos(np.arctan2(goal[1] - x[1], goal[0] - x[0])),
                                         x[1] + 10 * np.sin(np.arctan2(goal[1] - x[1], goal[0] - x[0]))), obstacles):
                 # No collision, move directly towards the goal
-                print("I'm out!")
+                # print("I'm out!")
                 direction = np.arctan2(goal[1] - x[1], goal[0] - x[0])
-                x[0] += config['max_speed'] * np.cos(direction)
-                x[1] += config['max_speed'] * np.sin(direction)
+                speed=config['max_speed']
+                steering_angle = direction - x[2]
+                x = dwa.motion(x, [speed, steering_angle])
             else:
                 # Collision detected, use DWA
                 print("I'm in!")
+                start_time = time.time()
                 u, _ = dwa.plan(x, goal, obstacles)
                 x = dwa.motion(x, u)
+
+                end_time = time.time()
+                if u == [0.0, 0.0]:
+                    # stop_status = True
+                    sum_time += end_time - start_time
+                    if sum_time >= 2:
+                        print("停滞时间过长，生成RRT路径中···")
+                        # 已经停滞，相当于起点，不用考虑转弯角度什么的
+                        tmp_rrt_path = VF_Bi_RRT_star_plan(x[:2], goal, obstacles,vector_feild)
+                        if tmp_rrt_path is not None:
+                            vf_rrt_path = tmp_rrt_path + vf_rrt_path[rrt_index + 1:]
+                            rrt_index = 0
+                    sum_time = 0.0
+                    break
 
             path.append(x[:2].copy())
 
@@ -145,11 +168,11 @@ def vf_rrt_dwa(start, goal, obstacles):
         if rrt_index == len(vf_rrt_path):
             rrt_index = len(vf_rrt_path)
         else:
-            rrt_index = find_nearest_point_index(x, vf_rrt_path, last_goal_index)
+            rrt_index = find_nearest_point_index(x, vf_rrt_path, last_goal_index,obstacles)
         # print("rrtindex:", rrt_index)
 
     # 最后十米没有障碍物直接到达
-    if not obstacles_in_front(path[-1], vf_rrt_path[-1], obstacles) and np.linalg.norm(path[-1] - vf_rrt_path[-1]) < 10:
+    if not obstacles_in_front(path[-1], vf_rrt_path[-1], obstacles) and np.linalg.norm(path[-1] - vf_rrt_path[-1]) < 5:
         path.append(vf_rrt_path[-1])
 
     for p in path:

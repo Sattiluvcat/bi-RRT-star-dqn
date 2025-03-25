@@ -7,6 +7,7 @@ from utils.node import Node
 
 
 # 结合向量场方向得到新节点
+# 随机方向归一化，向量保持原来的大小，两者加权平均
 def vf_generate_new_node(nearest_node, random_node, extend_length, vector_field, is_start_tree):
     # 获取最近节点到随机点的方向向量
     direction_to_random = np.array([random_node.x - nearest_node.x, random_node.y - nearest_node.y])
@@ -28,7 +29,7 @@ def vf_generate_new_node(nearest_node, random_node, extend_length, vector_field,
     average_direction_vector = (direction_to_random + direction_vector_field) / 2
 
     # 归一化平均方向向量
-    average_direction_vector /= np.linalg.norm(average_direction_vector)
+    # average_direction_vector /= np.linalg.norm(average_direction_vector)
 
     # 根据这个平均方向生成新节点
     new_x = nearest_node.x + extend_length * average_direction_vector[0]
@@ -41,6 +42,7 @@ def vf_generate_new_node(nearest_node, random_node, extend_length, vector_field,
 
 
 # 得到该位置向量场方向——插值
+# 向量大小
 def get_vector_field(x, y, vector_field):
     X, Y, U, V = vector_field
     x1 = int(np.floor(x)) + 20
@@ -57,6 +59,7 @@ def get_vector_field(x, y, vector_field):
 
 
 # 计算路径中每一步的上游系数结果（rrt-dwa方法）
+# 向量大小
 def upstream_criterion(path, vector_field):
     total_difference = 0
     for i in range(1, len(path)):
@@ -68,15 +71,16 @@ def upstream_criterion(path, vector_field):
         y_values = np.linspace(start_point[1], end_point[1], num_points)
         for x, y in zip(x_values, y_values):
             # 当前位置的向量场
-            u, v = get_vector_field(path[i][0], path[i][1], vector_field)
+            u, v = get_vector_field(x, y, vector_field)
             vector_field_magnitude = np.sqrt(u ** 2 + v ** 2)
-            # 本来已经归一化了 但是计算精度可能不准确 此处二加工
-            direction_vector_field = np.array([u, v]) / vector_field_magnitude
+            # vector_field_magnitude = 1
+            # 不做归一化，保留向量场大小
+            direction_vector_field = np.array([u, v]) / 1
 
             # 当前速度方向——路径求导
             direction_path = np.gradient(np.array(path), axis=0)[i]
             path_magnitude = np.linalg.norm(direction_path)
-            # 归一化速度方向 --> 需要，因为向量场本身已经归一化 --> 应用不等式时两者模长相等，均为1
+            # 归一化速度方向 --> 需要，因为向量场不做归一化 --> 应用不等式时两者模长相等，均为1
             direction_path /= path_magnitude
 
             # Cauchy-Schwarz 不等式: |a · b| <= ||a|| * ||b||
@@ -98,6 +102,40 @@ def choose_lowest_cost(paths, vector_field):
             best_path = path
     return best_path
 
+
+# 考虑流场的重写-->不做了，这个运行太浪费时间
+def vf_rewrite_index(new_node, node_list, obs_list,path_node,vector_field):
+    # 重写的条件：1.在地图内 2.不碰撞 3.最小cost
+    r = 8
+    min_score = float('inf')
+    min_node_index = None
+    for i, node in enumerate(node_list):
+        if calc_p2p_dis(new_node, node) <= r and not check_collision(new_node, node, obs_list):
+            if node.parent is not None:
+                degree = calc_triangle_deg(node, new_node, node.parent)
+                if degree < 90:
+                    continue
+            potential_score = path_score(path_node+[new_node, node], vector_field)
+            if potential_score < min_score:
+                min_score = potential_score
+                min_node_index = i
+    return min_node_index
+
+
+# 考虑流场的重布线
+def vf_rewire(node_new, node_list, obstacle_list, vector_field):
+    r = 15
+    for node in node_list:
+        if (node != node_new.parent and calc_p2p_dis(node_new, node) < r
+                and not check_collision(node_new, node, obstacle_list)):
+            if node_new.parent is not None:
+                degree = calc_triangle_deg(node_new, node, node_new.parent)
+                if degree <= 90:
+                    continue
+            potential_cost = path_score([node_new, node], vector_field)
+            if potential_cost < node.cost:
+                node.parent = node_new
+                node.cost = potential_cost
 
 # 考虑流场的剪枝
 def vf_prune_path(path, obs_list, vector_field):
@@ -145,14 +183,17 @@ def vf_prune_path(path, obs_list, vector_field):
 
 
 # 剪枝中的评分函数
+# 向量大小
 def path_score(path, vector_field):
     # print("score path:", path)
     # 累计diff 向量场方向与路径方向的差异
+    # 算完之后乘这个位置向量的大小，之后叠加得sum
     total_difference = 0
     # 累计转角
     total_angle = 0
     # 累计长度
     total_length = 0
+    direction_path=0
     # 评分细则（+转角考虑）
     for i in range(len(path) - 1):  # 最大值是 len(path) - 2
         start_point = path[i]
@@ -168,13 +209,13 @@ def path_score(path, vector_field):
         y_values = np.linspace(start_point[1], end_point[1], num_points)
         x_values = x_values[:num_points - 1]
         y_values = y_values[:num_points - 1]
+        direction_path = np.arctan2(end_point[1] - start_point[1], end_point[0] - start_point[0])
         for x, y in zip(x_values, y_values):
             u, v = get_vector_field(x, y, vector_field)
             if np.isnan(u) or np.isnan(v):
                 continue
             direction_vector_field = np.arctan2(v, u)
-            direction_path = np.arctan2(end_point[1] - start_point[1], end_point[0] - start_point[0])
-            total_difference += abs(direction_path - direction_vector_field)
+            total_difference += abs(direction_path - direction_vector_field)*np.linalg.norm([u,v])
             # if np.isnan(total_difference):
             #     print("u:", u, " v:", v, " direction_vector_field:", direction_vector_field, " direction_path:",
             #           direction_path, " start:", start_point, " end:", end_point)
@@ -203,7 +244,7 @@ def VF_Bi_RRT_star_plan(start_xy, goal_xy, obslis_xy, vector_field):
     start_point = start_xy
     goal_point = goal_xy
     obs_list = obslis_xy
-    extend_length = 5  # TODO：要走迷宫的话改为10，rewrite里的半径改为15
+    extend_length = 5  # 要走迷宫的话改为10，rewrite里的半径改为15
     max_iter = 10000
     mini_degree = 90  # 最大转角，180°-mini_degree，反着定义
     # 路径总数
