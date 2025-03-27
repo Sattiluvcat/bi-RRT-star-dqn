@@ -52,7 +52,8 @@ def vf_rrt_dwa(start, goal, obstacles):
         'yawrate_reso': 0.15 * np.pi / 180.0,  # 旋转速率的分辨率（步长——每次增加这么多）
         'dt': 1.0,  # Reduce time step
         'predict_time': 5.0,  # Reduce prediction time
-        'to_goal_cost_gain': 1.0,
+        'obs_cost_gain': 0.05,  # 障碍物cost的权重
+        'to_goal_cost_gain': 0.5,
         'speed_cost_gain': 1.0,
         'robot_radius': 1.0,    # 机器人半径
         # 相对非vf的dwa增加的参数，考虑向量方向影响

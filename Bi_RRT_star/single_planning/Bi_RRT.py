@@ -424,7 +424,7 @@ def re_obs(obs_list):
 
 
 # 画圆
-def plot_obs(x, y, size, color="-b",s=0):  # pragma: no cover
+def plot_obs(x, y, size, color="-b",s=1):  # pragma: no cover
     deg = list(range(0, 360, 5))
     deg.append(0)
     xl = [x + size * math.cos(math.radians(d)) for d in deg]
@@ -433,7 +433,7 @@ def plot_obs(x, y, size, color="-b",s=0):  # pragma: no cover
 
 
 # 画方
-def plot_obs_rec(x1, y1, x2, y2, color="-b",s=0):
+def plot_obs_rec(x1, y1, x2, y2, color="-b",s=1):
     xl = [x1, x2, x2, x1, x1]
     yl = [y1, y1, y2, y2, y1]
     plt.plot(xl, yl, color,label="dynamic_obstacles" if s==0 else None)

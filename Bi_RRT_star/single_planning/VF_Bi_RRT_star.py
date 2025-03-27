@@ -6,38 +6,103 @@ from single_planning.Bi_RRT_star import *
 from utils.node import Node
 
 
+def get_changed_direction(q_near, q_rand, F, lambda_param=0.1):
+    """论文中的GetChangedDirection逻辑"""
+    # 计算随机方向向量v_rand
+    dx_rand = q_rand.x - q_near.x
+    dy_rand = q_rand.y - q_near.y
+    v_rand = np.array([dx_rand, dy_rand])
+    norm_rand = np.linalg.norm(v_rand)
+    if norm_rand < 1e-6:
+        return np.zeros(2)
+    v_rand = v_rand / norm_rand
+
+    # 计算向量场方向v_field
+    F_norm = np.linalg.norm(F)
+    if F_norm < 1e-6:
+        return v_rand
+    v_field = F / F_norm
+
+    # 计算夹角θ_rand
+    cos_theta = np.dot(v_rand, v_field)
+    theta_rand = np.arccos(np.clip(cos_theta, -1.0, 1.0))
+
+    # 计算上游成本U_rand
+    U_rand = F_norm * (1 - cos_theta)
+
+    # 指数分布逆变换计算U_new
+    if F_norm < 1e-6 or lambda_param < 1e-6:
+        U_new = U_rand
+    else:
+        numerator = U_rand * (1 - np.exp(-2 * lambda_param * F_norm))
+        denominator = 2 * F_norm
+        U_new = -np.log(1 - numerator / denominator) / lambda_param if denominator > 1e-6 else 0
+
+    # 计算θ_new和权重w
+    U_new_clamped = min(U_new, 2 * F_norm)
+    cos_theta_new = 1 - U_new_clamped / F_norm
+    theta_new = np.arccos(np.clip(cos_theta_new, -1.0, 1.0))
+
+    if np.sin(theta_new) < 1e-6:
+        w = 0.0
+    else:
+        w = np.sin(theta_rand - theta_new) / np.sin(theta_new)
+
+    # 合成新方向
+    v_new = v_rand + w * v_field
+    return v_new / np.linalg.norm(v_new) if np.linalg.norm(v_new) > 1e-6 else v_rand
+
+
 # 结合向量场方向得到新节点
 # 随机方向归一化，向量保持原来的大小，两者加权平均
-def vf_generate_new_node(nearest_node, random_node, extend_length, vector_field, is_start_tree):
-    # 获取最近节点到随机点的方向向量
-    direction_to_random = np.array([random_node.x - nearest_node.x, random_node.y - nearest_node.y])
-    # 不该出现0的情况（原来是回旋镖）
-    if np.linalg.norm(direction_to_random) != 0:
-        direction_to_random /= np.linalg.norm(direction_to_random)
-    # print("nearest_node:", nearest_node.x, nearest_node.y)
+def vf_generate_new_node(nearest_node, random_node, extend_length, vector_field, is_start_tree,lambda_param):
+    # # 获取最近节点到随机点的方向向量
+    # direction_to_random = np.array([random_node.x - nearest_node.x, random_node.y - nearest_node.y])
+    # # 不该出现0的情况（原来是回旋镖）
+    # if np.linalg.norm(direction_to_random) != 0:
+    #     direction_to_random /= np.linalg.norm(direction_to_random)
+    # # print("nearest_node:", nearest_node.x, nearest_node.y)
+    #
+    # # 获取最近节点处的向量场方向
+    # u, v = get_vector_field(nearest_node.x, nearest_node.y, vector_field)
+    # direction_vector_field = np.array([u, v])
+    #
+    # # 终点树向量场反向
+    # if not is_start_tree:
+    #     direction_vector_field = -direction_vector_field
+    #
+    # # 两个方向向量的加权平均方向
+    # average_direction_vector = (direction_to_random + direction_vector_field) / 2
+    #
+    # # 归一化平均方向向量
+    # # average_direction_vector /= np.linalg.norm(average_direction_vector)
+    #
+    # # 根据这个平均方向生成新节点
+    # new_x = nearest_node.x + extend_length * average_direction_vector[0]
+    # new_y = nearest_node.y + extend_length * average_direction_vector[1]
 
-    # 获取最近节点处的向量场方向
+    # 获取向量场（需保持原有坐标系处理逻辑）
     u, v = get_vector_field(nearest_node.x, nearest_node.y, vector_field)
-    direction_vector_field = np.array([u, v])
+    F = np.array([u, v])
 
     # 终点树向量场反向
     if not is_start_tree:
-        direction_vector_field = -direction_vector_field
+        F = -F
 
-    # TODO 方向选取的优化
-    # 两个方向向量的加权平均方向
-    average_direction_vector = (direction_to_random + direction_vector_field) / 2
+    # 调用论文方法生成方向
+    v_new = get_changed_direction(
+        q_near=nearest_node,
+        q_rand=random_node,
+        F=F,
+        lambda_param=lambda_param  # 可调整为参数
+    )
 
-    # 归一化平均方向向量
-    # average_direction_vector /= np.linalg.norm(average_direction_vector)
-
-    # 根据这个平均方向生成新节点
-    new_x = nearest_node.x + extend_length * average_direction_vector[0]
-    new_y = nearest_node.y + extend_length * average_direction_vector[1]
+    # 生成新节点
+    new_x = nearest_node.x + v_new[0] * extend_length
+    new_y = nearest_node.y + v_new[1] * extend_length
 
     new_node = Node(new_x, new_y)
     new_node.parent = nearest_node
-
     return new_node
 
 
@@ -104,7 +169,7 @@ def choose_lowest_cost(paths, vector_field):
 
 
 # 考虑流场的重写-->不做了，这个运行太浪费时间
-def vf_rewrite_index(new_node, node_list, obs_list,path_node,vector_field):
+def vf_rewrite_index(new_node, node_list, obs_list, path_node, vector_field):
     # 重写的条件：1.在地图内 2.不碰撞 3.最小cost
     r = 8
     min_score = float('inf')
@@ -115,7 +180,7 @@ def vf_rewrite_index(new_node, node_list, obs_list,path_node,vector_field):
                 degree = calc_triangle_deg(node, new_node, node.parent)
                 if degree < 90:
                     continue
-            potential_score = path_score(path_node+[new_node, node], vector_field)
+            potential_score = path_score(path_node + [new_node, node], vector_field)
             if potential_score < min_score:
                 min_score = potential_score
                 min_node_index = i
@@ -136,6 +201,7 @@ def vf_rewire(node_new, node_list, obstacle_list, vector_field):
             if potential_cost < node.cost:
                 node.parent = node_new
                 node.cost = potential_cost
+
 
 # 考虑流场的剪枝
 def vf_prune_path(path, obs_list, vector_field):
@@ -193,7 +259,7 @@ def path_score(path, vector_field):
     total_angle = 0
     # 累计长度
     total_length = 0
-    direction_path=0
+    direction_path = 0
     # 评分细则（+转角考虑）
     for i in range(len(path) - 1):  # 最大值是 len(path) - 2
         start_point = path[i]
@@ -215,7 +281,7 @@ def path_score(path, vector_field):
             if np.isnan(u) or np.isnan(v):
                 continue
             direction_vector_field = np.arctan2(v, u)
-            total_difference += abs(direction_path - direction_vector_field)*np.linalg.norm([u,v])
+            total_difference += abs(direction_path - direction_vector_field) * np.linalg.norm([u, v])
             # if np.isnan(total_difference):
             #     print("u:", u, " v:", v, " direction_vector_field:", direction_vector_field, " direction_path:",
             #           direction_path, " start:", start_point, " end:", end_point)
@@ -236,7 +302,8 @@ def path_score(path, vector_field):
     return total_difference * prize_difference + total_angle * prize_angle + total_length * prize_length
 
 
-def VF_Bi_RRT_star_plan(start_xy, goal_xy, obslis_xy, vector_field):
+def VF_Bi_RRT_star_plan(start_xy, goal_xy, obslis_xy, vector_field,lambda_param=3):
+    """设置lamda_param越小，越不考虑向量场的影响，采用了VF-RRT原生方法"""
     x_min = min(start_xy[0], goal_xy[0]) - 10
     x_max = max(start_xy[0], goal_xy[0]) + 10
     y_min = min(start_xy[1], goal_xy[1]) - 10
@@ -271,14 +338,14 @@ def VF_Bi_RRT_star_plan(start_xy, goal_xy, obslis_xy, vector_field):
             near_index1 = get_nearest_node_index(node_list1, rnd_nd1)
             near_index2 = get_nearest_node_index(node_list2, rnd_nd2)
             new_nd1 = vf_generate_new_node(node_list1[near_index1], rnd_nd1, extend_length, vector_field,
-                                           is_start_tree=True)
+                                           is_start_tree=True,lambda_param=lambda_param)
             # print("new_nd1:", new_nd1.x, new_nd1.y)
             # 判断新节点1是否在地图内
             if (x_min >= new_nd1.x or new_nd1.x >= x_max or y_min >= new_nd1.y or new_nd1.y >= y_max
                     or new_nd1.x is None):
                 continue
             new_nd2 = vf_generate_new_node(node_list2[near_index2], rnd_nd2, extend_length, vector_field,
-                                           is_start_tree=False)
+                                           is_start_tree=False,lambda_param=lambda_param)
             # print("new_nd2:", new_nd2.x, new_nd2.y)
             # 判断新节点2是否在地图内
             if (x_min >= new_nd2.x or new_nd2.x >= x_max or y_min >= new_nd2.y or new_nd2.y >= y_max
